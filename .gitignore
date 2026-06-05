@@ -1,0 +1,20 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+.omx/
+
+# Browser scratch captures kept locally during iteration.
+학습과정/web_demo_desktop.png
+학습과정/web_demo_mobile.png
+학습과정/web_demo_result_desktop.png
+학습과정/web_demo_desktop_modern.png
+학습과정/web_demo_mobile_modern.png
+학습과정/web_demo_result_desktop_modern.png
+학습과정/web_demo_mobile_snapshot.txt
