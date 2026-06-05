@@ -1,19 +1,19 @@
 {
-  "trained_at": "2026-06-05T05:27:56.783361+00:00",
+  "trained_at": "2026-06-05T05:46:59.182142+00:00",
   "algorithm": "sklearn.ensemble.BaggingClassifier",
   "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-  "training_profile": "title_tenancy_text_robust_offline_demo",
-  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, and tenancy/title text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, and non-refundable reservation deposit patterns; increased Bagging ensemble capacity while keeping grouped validation.",
+  "training_profile": "priority_auction_text_robust_offline_demo",
+  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, and priority/auction text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, and same-day loan-before-move-in patterns; increased Bagging ensemble capacity while keeping grouped validation.",
   "random_state": 42,
-  "n_estimators": 580,
+  "n_estimators": 600,
   "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
   "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
   "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
-  "rows": 126488,
+  "rows": 129488,
   "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
-  "train_rows": 83148,
-  "validation_rows": 18155,
-  "holdout_rows": 25185,
+  "train_rows": 84630,
+  "validation_rows": 18749,
+  "holdout_rows": 26109,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
@@ -22,30 +22,33 @@
     "synthetic_counterfactual_danger": 6400,
     "synthetic_counterfactual_safe": 4800,
     "synthetic_counterfactual_caution": 4800,
-    "synthetic_emerging_safe": 4500,
     "synthetic_emerging_caution": 4500,
+    "synthetic_emerging_safe": 4500,
     "synthetic_user_phrase_danger": 4500,
     "synthetic_colloquial_danger": 4305,
-    "synthetic_hard_caution": 3334,
     "synthetic_hard_danger": 3334,
+    "synthetic_hard_caution": 3334,
     "synthetic_hard_safe": 3332,
     "synthetic_payment_building_danger": 3332,
-    "public_indicator_safe": 2400,
     "public_indicator_caution": 2400,
+    "public_indicator_safe": 2400,
     "synthetic_user_phrase_caution": 2250,
     "synthetic_user_phrase_safe": 2250,
     "synthetic_colloquial_safe": 1848,
     "synthetic_colloquial_caution": 1847,
+    "synthetic_priority_auction_danger": 1800,
     "synthetic_tenancy_title_danger": 1500,
-    "synthetic_payment_building_safe": 1334,
     "synthetic_payment_building_caution": 1334,
+    "synthetic_payment_building_safe": 1334,
+    "synthetic_tenancy_title_safe": 750,
     "synthetic_tenancy_title_caution": 750,
-    "synthetic_tenancy_title_safe": 750
+    "synthetic_priority_auction_safe": 600,
+    "synthetic_priority_auction_caution": 600
   },
   "label_counts": {
-    "안전": 39662,
-    "주의": 37399,
-    "위험": 49427
+    "안전": 40262,
+    "주의": 37943,
+    "위험": 51283
   },
   "features": [
     "deposit_million",
@@ -141,56 +144,56 @@
     "2": "위험"
   },
   "validation_metrics": {
-    "accuracy": 0.9885,
-    "balanced_accuracy": 0.988,
-    "macro_f1": 0.988,
-    "weighted_f1": 0.9885,
-    "macro_precision": 0.9882,
-    "macro_recall": 0.988,
-    "rows": 18155,
+    "accuracy": 0.9911,
+    "balanced_accuracy": 0.9917,
+    "macro_f1": 0.9912,
+    "weighted_f1": 0.9912,
+    "macro_precision": 0.9908,
+    "macro_recall": 0.9917,
+    "rows": 18749,
     "confusion_matrix": [
       [
-        5668,
-        0,
+        5709,
+        28,
         0
       ],
       [
-        79,
-        5122,
-        60
+        0,
+        5654,
+        29
       ],
       [
         0,
-        70,
-        7156
+        109,
+        7220
       ]
     ]
   },
   "metrics": {
-    "accuracy": 0.9813,
-    "balanced_accuracy": 0.9807,
-    "macro_f1": 0.9803,
-    "weighted_f1": 0.9814,
-    "macro_precision": 0.9803,
-    "macro_recall": 0.9807,
-    "rows": 25185,
+    "accuracy": 0.9754,
+    "balanced_accuracy": 0.9739,
+    "macro_f1": 0.9745,
+    "weighted_f1": 0.9755,
+    "macro_precision": 0.9752,
+    "macro_recall": 0.9739,
+    "rows": 26109,
     "confusion_matrix": [
       [
-        7737,
+        7839,
         252,
         0
       ],
       [
-        0,
-        7102,
-        118
+        28,
+        7351,
+        252
       ],
       [
         0,
-        100,
-        9876
+        109,
+        10278
       ]
     ],
-    "test_rows": 25185
+    "test_rows": 26109
   }
 }

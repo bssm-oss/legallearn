@@ -6,8 +6,8 @@
 - 알고리즘: `sklearn.ensemble.BaggingClassifier`
 - 기본 추정기: `sklearn.tree.DecisionTreeClassifier`
 - 학습 데이터: `/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv`
-- 전체 행 수: 126488
-- 학습/검증/홀드아웃: 83148 / 18155 / 25185
+- 전체 행 수: 129488
+- 학습/검증/홀드아웃: 84630 / 18749 / 26109
 
 ## 입력과 출력
 
@@ -17,24 +17,24 @@
 
 ## 추가학습 구성
 
-- 학습 프로필: `title_tenancy_text_robust_offline_demo`
-- 보강 전략: Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, and tenancy/title text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, and non-refundable reservation deposit patterns; increased Bagging ensemble capacity while keeping grouped validation.
+- 학습 프로필: `priority_auction_text_robust_offline_demo`
+- 보강 전략: Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, and priority/auction text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, and same-day loan-before-move-in patterns; increased Bagging ensemble capacity while keeping grouped validation.
 
 ## 평가 결과
 
 Validation:
 
-- Accuracy: 0.9885
-- Balanced Accuracy: 0.988
-- Macro F1: 0.988
-- Rows: 18155
+- Accuracy: 0.9911
+- Balanced Accuracy: 0.9917
+- Macro F1: 0.9912
+- Rows: 18749
 
 Holdout:
 
-- Accuracy: 0.9813
-- Balanced Accuracy: 0.9807
-- Macro F1: 0.9803
-- Rows: 25185
+- Accuracy: 0.9754
+- Balanced Accuracy: 0.9739
+- Macro F1: 0.9745
+- Rows: 26109
 
 ## 사용 범위
 
