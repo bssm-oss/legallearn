@@ -1,0 +1,169 @@
+{
+  "trained_at": "2026-06-05T03:35:28.112098+00:00",
+  "algorithm": "sklearn.ensemble.BaggingClassifier",
+  "base_estimator": "sklearn.tree.DecisionTreeClassifier",
+  "training_profile": "service_like_offline_demo",
+  "random_state": 42,
+  "n_estimators": 240,
+  "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
+  "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
+  "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
+  "rows": 66488,
+  "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
+  "train_rows": 43356,
+  "validation_rows": 9731,
+  "holdout_rows": 13401,
+  "source_counts": {
+    "case_derived": 26488,
+    "synthetic_safe_reference": 18000,
+    "public_indicator_danger": 7200,
+    "synthetic_hard_caution": 3334,
+    "synthetic_hard_danger": 3334,
+    "synthetic_hard_safe": 3332,
+    "public_indicator_caution": 2400,
+    "public_indicator_safe": 2400
+  },
+  "label_counts": {
+    "안전": 24208,
+    "주의": 22086,
+    "위험": 20194
+  },
+  "features": [
+    "deposit_million",
+    "monthly_rent_million",
+    "sale_price_million",
+    "estimated_market_price_million",
+    "mortgage_million",
+    "senior_claim_million",
+    "jeonse_ratio",
+    "debt_ratio",
+    "nearby_market_gap_percent",
+    "contract_period_months",
+    "danger_term_count",
+    "registry_term_count",
+    "broker_term_count",
+    "lease_term_count",
+    "sale_term_count",
+    "contract_type",
+    "property_type",
+    "region",
+    "legal_category",
+    "seizure",
+    "provisional_seizure",
+    "trust_registered",
+    "illegal_building",
+    "landlord_multiple_properties",
+    "landlord_prior_incidents",
+    "broker_unregistered",
+    "broker_advertising_issue",
+    "suspicious_special_clause",
+    "guarantee_insurance_available",
+    "fixed_date_ready",
+    "move_in_ready",
+    "broker_explained_rights",
+    "has_crime_signal",
+    "has_broker_signal",
+    "has_registry_signal",
+    "combined_text"
+  ],
+  "numeric_features": [
+    "deposit_million",
+    "monthly_rent_million",
+    "sale_price_million",
+    "estimated_market_price_million",
+    "mortgage_million",
+    "senior_claim_million",
+    "jeonse_ratio",
+    "debt_ratio",
+    "nearby_market_gap_percent",
+    "contract_period_months",
+    "danger_term_count",
+    "registry_term_count",
+    "broker_term_count",
+    "lease_term_count",
+    "sale_term_count"
+  ],
+  "categorical_features": [
+    "contract_type",
+    "property_type",
+    "region",
+    "legal_category"
+  ],
+  "boolean_features": [
+    "seizure",
+    "provisional_seizure",
+    "trust_registered",
+    "illegal_building",
+    "landlord_multiple_properties",
+    "landlord_prior_incidents",
+    "broker_unregistered",
+    "broker_advertising_issue",
+    "suspicious_special_clause",
+    "guarantee_insurance_available",
+    "fixed_date_ready",
+    "move_in_ready",
+    "broker_explained_rights",
+    "has_crime_signal",
+    "has_broker_signal",
+    "has_registry_signal"
+  ],
+  "text_feature": "combined_text",
+  "label_mapping": {
+    "0": "안전",
+    "1": "주의",
+    "2": "위험"
+  },
+  "validation_metrics": {
+    "accuracy": 0.9892,
+    "balanced_accuracy": 0.9889,
+    "macro_f1": 0.9891,
+    "weighted_f1": 0.9892,
+    "macro_precision": 0.9893,
+    "macro_recall": 0.9889,
+    "rows": 9731,
+    "confusion_matrix": [
+      [
+        3407,
+        0,
+        0
+      ],
+      [
+        28,
+        3291,
+        22
+      ],
+      [
+        0,
+        55,
+        2928
+      ]
+    ]
+  },
+  "metrics": {
+    "accuracy": 0.9781,
+    "balanced_accuracy": 0.9778,
+    "macro_f1": 0.9782,
+    "weighted_f1": 0.9782,
+    "macro_precision": 0.9788,
+    "macro_recall": 0.9778,
+    "rows": 13401,
+    "confusion_matrix": [
+      [
+        4755,
+        112,
+        0
+      ],
+      [
+        28,
+        4551,
+        44
+      ],
+      [
+        23,
+        86,
+        3802
+      ]
+    ],
+    "test_rows": 13401
+  }
+}

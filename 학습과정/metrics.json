@@ -1,0 +1,55 @@
+{
+  "validation": {
+    "accuracy": 0.9892,
+    "balanced_accuracy": 0.9889,
+    "macro_f1": 0.9891,
+    "weighted_f1": 0.9892,
+    "macro_precision": 0.9893,
+    "macro_recall": 0.9889,
+    "rows": 9731,
+    "confusion_matrix": [
+      [
+        3407,
+        0,
+        0
+      ],
+      [
+        28,
+        3291,
+        22
+      ],
+      [
+        0,
+        55,
+        2928
+      ]
+    ]
+  },
+  "holdout": {
+    "accuracy": 0.9781,
+    "balanced_accuracy": 0.9778,
+    "macro_f1": 0.9782,
+    "weighted_f1": 0.9782,
+    "macro_precision": 0.9788,
+    "macro_recall": 0.9778,
+    "rows": 13401,
+    "confusion_matrix": [
+      [
+        4755,
+        112,
+        0
+      ],
+      [
+        28,
+        4551,
+        44
+      ],
+      [
+        23,
+        86,
+        3802
+      ]
+    ],
+    "test_rows": 13401
+  }
+}
