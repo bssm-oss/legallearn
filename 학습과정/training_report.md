@@ -15,11 +15,11 @@
 
 ## 서비스형 학습 구성
 
-- 전체 학습 데이터 행 수: 66488
-- 학습 행 수: 43356
-- 검증 행 수: 9731
-- 홀드아웃 테스트 행 수: 13401
-- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시
+- 전체 학습 데이터 행 수: 82488
+- 학습 행 수: 53798
+- 검증 행 수: 11738
+- 홀드아웃 테스트 행 수: 16952
+- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시
 - 누수 방지: 같은 `source_case_number` 그룹이 학습/검증/홀드아웃에 동시에 들어가지 않도록 분리
 
 데이터 소스 분포:
@@ -28,28 +28,31 @@
   "case_derived": 26488,
   "synthetic_safe_reference": 18000,
   "public_indicator_danger": 7200,
-  "synthetic_hard_caution": 3334,
+  "synthetic_counterfactual_danger": 6400,
+  "synthetic_counterfactual_caution": 4800,
+  "synthetic_counterfactual_safe": 4800,
   "synthetic_hard_danger": 3334,
+  "synthetic_hard_caution": 3334,
   "synthetic_hard_safe": 3332,
-  "public_indicator_caution": 2400,
-  "public_indicator_safe": 2400
+  "public_indicator_safe": 2400,
+  "public_indicator_caution": 2400
 }
 
 계약 유형 분포:
 
 {
-  "jeonse": 30193,
-  "sale": 23132,
-  "monthly_rent": 13163
+  "jeonse": 39793,
+  "sale": 26332,
+  "monthly_rent": 16363
 }
 
 주택 유형 분포:
 
 {
-  "apartment": 20845,
-  "villa": 19439,
-  "officetel": 13522,
-  "multi_family": 9854,
+  "apartment": 25645,
+  "villa": 24239,
+  "officetel": 18322,
+  "multi_family": 11454,
   "commercial": 2828
 }
 
@@ -57,12 +60,12 @@
 
 {
   "0.0": 6.05,
-  "0.25": 26.32,
-  "0.5": 50.27,
-  "0.75": 78.06,
-  "0.9": 95.5,
+  "0.25": 26.63,
+  "0.5": 51.0,
+  "0.75": 79.32,
+  "0.9": 94.67,
   "0.99": 98.0,
-  "1.0": 98.99
+  "1.0": 99.0
 }
 
 ## Bagging 알고리즘 적용
@@ -78,27 +81,27 @@ Bagging은 여러 개의 결정트리를 bootstrap 표본으로 학습하고 예
 ## 데이터 분포
 
 {
-  "안전": 24208,
-  "주의": 22086,
-  "위험": 20194
+  "안전": 29008,
+  "주의": 26886,
+  "위험": 26594
 }
 
 ## 평가 결과
 
-- Accuracy: 0.9781
-- Balanced Accuracy: 0.9778
-- Macro F1: 0.9782
-- Weighted F1: 0.9782
-- Macro Precision: 0.9788
-- Macro Recall: 0.9778
-- Test rows: 13401
+- Accuracy: 0.9736
+- Balanced Accuracy: 0.9735
+- Macro F1: 0.9733
+- Weighted F1: 0.9737
+- Macro Precision: 0.9733
+- Macro Recall: 0.9735
+- Test rows: 16952
 
 ## 검증 분리 방식
 
 - 같은 판례 번호에서 파생된 변형 데이터가 학습/검증/테스트에 동시에 들어가지 않도록 `source_case_number` 기준 그룹 분리를 적용했다.
-- Validation rows: 9731
-- Validation Macro F1: 0.9891
-- Holdout rows: 13401
+- Validation rows: 11738
+- Validation Macro F1: 0.9837
+- Holdout rows: 16952
 
 상세 결과:
 - `학습과정/classification_report.txt`

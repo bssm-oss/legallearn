@@ -17,7 +17,7 @@
 ## 제출 설명 순서
 
 1. 문제 정의: 사기 여부를 단정하지 않고 계약 전 위험 신호를 `안전 / 주의 / 위험`으로 점수화합니다.
-2. 데이터 구축: 판례 CSV, 공개자료 기반 위험 지표, 정상/경계/위험 파생 계약 데이터를 오프라인으로 결합합니다.
+2. 데이터 구축: 판례 CSV, 공개자료 기반 위험 지표, 정상/경계/위험 파생 계약 데이터, 추가 반례 데이터를 오프라인으로 결합합니다.
 3. 모델 학습: `BaggingClassifier`가 수치·범주·불리언·텍스트 피처를 함께 학습합니다.
 4. 평가: 같은 판례에서 파생된 데이터가 train/test에 동시에 섞이지 않도록 `source_case_number` 그룹 분리를 사용합니다.
 5. 시연: 사용자가 계약 정보를 입력하면 Bagging 확률과 규칙 기반 점수를 섞어 최종 위험도를 보여줍니다.
@@ -108,14 +108,15 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 
 최근 학습 결과:
 
-- 전체 데이터: `66,488`행
-- 학습/검증/홀드아웃: `43,356 / 9,731 / 13,401`
-- Validation Macro F1: `0.9891`
-- Holdout Accuracy: `0.9781`
-- Holdout Balanced Accuracy: `0.9778`
-- Holdout Macro F1: `0.9782`
-- Holdout Weighted F1: `0.9782`
-- Bagging estimators: `240`
+- 전체 데이터: `82,488`행
+- 학습/검증/홀드아웃: `53,798 / 11,738 / 16,952`
+- Validation Macro F1: `0.9837`
+- Holdout Accuracy: `0.9736`
+- Holdout Balanced Accuracy: `0.9735`
+- Holdout Macro F1: `0.9733`
+- Holdout Weighted F1: `0.9737`
+- Bagging estimators: `320`
+- 추가학습: 전세가율만 높거나 낮은데 법적 신호가 엇갈리는 반례 `16,000`건 추가
 - 분리 방식: `source_case_number` 기준 그룹 분리
 
 학습 과정 설명 노트북:
@@ -140,8 +141,8 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 
 - 로컬 주소: `http://127.0.0.1:8765`
 - API health: `GET /api/health` 200, `model_exists=true`
-- API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 15.5점`, 고위험 기본 예시 `위험 84.0점`
-- 자동 테스트: `6 passed in 3.09s`
+- API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 15.5점`, 고위험 기본 예시 `위험 86.0점`
+- 자동 테스트: `7 passed in 3.63s`
 - 브라우저 콘솔: 메시지 없음
 - 데스크톱/모바일 캡처:
   - `학습과정/web_demo_desktop_final.png`
@@ -161,6 +162,7 @@ flowchart LR
   A["판례 CSV"] --> D["파생 계약 데이터 생성"]
   B["공개자료 위험 지표"] --> D
   C["정상/경계/위험 예시"] --> D
+  I["추가 반례 예시"] --> D
   D --> E["전처리: 수치, 범주, 불리언, 텍스트"]
   E --> F["BaggingClassifier 학습"]
   F --> G["Validation / Holdout 평가"]

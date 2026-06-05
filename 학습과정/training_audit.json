@@ -1,32 +1,36 @@
 {
-  "trained_at": "2026-06-05T03:35:28.112098+00:00",
+  "trained_at": "2026-06-05T04:11:18.164739+00:00",
   "algorithm": "sklearn.ensemble.BaggingClassifier",
   "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-  "training_profile": "service_like_offline_demo",
+  "training_profile": "counterfactual_augmented_offline_demo",
+  "additional_training_strategy": "Added counterfactual safe/caution/danger stress examples and increased Bagging ensemble capacity while keeping grouped validation.",
   "random_state": 42,
-  "n_estimators": 240,
+  "n_estimators": 320,
   "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
   "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
   "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
-  "rows": 66488,
+  "rows": 82488,
   "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
-  "train_rows": 43356,
-  "validation_rows": 9731,
-  "holdout_rows": 13401,
+  "train_rows": 53798,
+  "validation_rows": 11738,
+  "holdout_rows": 16952,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
     "public_indicator_danger": 7200,
-    "synthetic_hard_caution": 3334,
+    "synthetic_counterfactual_danger": 6400,
+    "synthetic_counterfactual_caution": 4800,
+    "synthetic_counterfactual_safe": 4800,
     "synthetic_hard_danger": 3334,
+    "synthetic_hard_caution": 3334,
     "synthetic_hard_safe": 3332,
-    "public_indicator_caution": 2400,
-    "public_indicator_safe": 2400
+    "public_indicator_safe": 2400,
+    "public_indicator_caution": 2400
   },
   "label_counts": {
-    "안전": 24208,
-    "주의": 22086,
-    "위험": 20194
+    "안전": 29008,
+    "주의": 26886,
+    "위험": 26594
   },
   "features": [
     "deposit_million",
@@ -114,56 +118,56 @@
     "2": "위험"
   },
   "validation_metrics": {
-    "accuracy": 0.9892,
-    "balanced_accuracy": 0.9889,
-    "macro_f1": 0.9891,
-    "weighted_f1": 0.9892,
-    "macro_precision": 0.9893,
-    "macro_recall": 0.9889,
-    "rows": 9731,
+    "accuracy": 0.9836,
+    "balanced_accuracy": 0.9836,
+    "macro_f1": 0.9837,
+    "weighted_f1": 0.9836,
+    "macro_precision": 0.9837,
+    "macro_recall": 0.9836,
+    "rows": 11738,
     "confusion_matrix": [
       [
-        3407,
-        0,
+        4077,
+        56,
         0
       ],
       [
-        28,
-        3291,
-        22
+        59,
+        3851,
+        36
       ],
       [
         0,
-        55,
-        2928
+        42,
+        3617
       ]
     ]
   },
   "metrics": {
-    "accuracy": 0.9781,
-    "balanced_accuracy": 0.9778,
-    "macro_f1": 0.9782,
-    "weighted_f1": 0.9782,
-    "macro_precision": 0.9788,
-    "macro_recall": 0.9778,
-    "rows": 13401,
+    "accuracy": 0.9736,
+    "balanced_accuracy": 0.9735,
+    "macro_f1": 0.9733,
+    "weighted_f1": 0.9737,
+    "macro_precision": 0.9733,
+    "macro_recall": 0.9735,
+    "rows": 16952,
     "confusion_matrix": [
       [
-        4755,
-        112,
+        5638,
+        140,
         0
       ],
       [
-        28,
-        4551,
-        44
+        87,
+        5242,
+        73
       ],
       [
-        23,
-        86,
-        3802
+        0,
+        148,
+        5624
       ]
     ],
-    "test_rows": 13401
+    "test_rows": 16952
   }
 }

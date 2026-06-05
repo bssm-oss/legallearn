@@ -6,8 +6,8 @@
 - 알고리즘: `sklearn.ensemble.BaggingClassifier`
 - 기본 추정기: `sklearn.tree.DecisionTreeClassifier`
 - 학습 데이터: `/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv`
-- 전체 행 수: 66488
-- 학습/검증/홀드아웃: 43356 / 9731 / 13401
+- 전체 행 수: 82488
+- 학습/검증/홀드아웃: 53798 / 11738 / 16952
 
 ## 입력과 출력
 
@@ -15,21 +15,26 @@
 - 출력: `안전`, `주의`, `위험` 3개 등급의 모델 확률
 - 최종 앱 점수: Bagging 모델 확률과 명시적 위험 규칙을 혼합한 0~100점
 
+## 추가학습 구성
+
+- 학습 프로필: `counterfactual_augmented_offline_demo`
+- 보강 전략: Added counterfactual safe/caution/danger stress examples and increased Bagging ensemble capacity while keeping grouped validation.
+
 ## 평가 결과
 
 Validation:
 
-- Accuracy: 0.9892
-- Balanced Accuracy: 0.9889
-- Macro F1: 0.9891
-- Rows: 9731
+- Accuracy: 0.9836
+- Balanced Accuracy: 0.9836
+- Macro F1: 0.9837
+- Rows: 11738
 
 Holdout:
 
-- Accuracy: 0.9781
-- Balanced Accuracy: 0.9778
-- Macro F1: 0.9782
-- Rows: 13401
+- Accuracy: 0.9736
+- Balanced Accuracy: 0.9735
+- Macro F1: 0.9733
+- Rows: 16952
 
 ## 사용 범위
 
