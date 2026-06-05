@@ -53,7 +53,7 @@ def _prepare_features(df: pd.DataFrame) -> pd.DataFrame:
     return prepared
 
 
-def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 240) -> Pipeline:
+def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 320) -> Pipeline:
     # 수치, 범주, 불리언, 텍스트를 각각 전처리한 뒤 BaggingClassifier가 함께 학습한다.
     numeric_pipeline = Pipeline(
         steps=[
@@ -72,7 +72,7 @@ def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 240) -> P
             (
                 "tfidf",
                 TfidfVectorizer(
-                    max_features=2200,
+                    max_features=3200,
                     ngram_range=(1, 2),
                     min_df=2,
                     sublinear_tf=True,
@@ -89,16 +89,16 @@ def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 240) -> P
         ]
     )
     tree = DecisionTreeClassifier(
-        max_depth=13,
-        min_samples_leaf=8,
+        max_depth=15,
+        min_samples_leaf=6,
         class_weight="balanced",
         random_state=random_state,
     )
     classifier = BaggingClassifier(
         estimator=tree,
         n_estimators=n_estimators,
-        max_samples=0.82,
-        max_features=0.90,
+        max_samples=0.86,
+        max_features=0.92,
         bootstrap=True,
         bootstrap_features=False,
         n_jobs=-1,
@@ -255,7 +255,7 @@ def write_training_report(
 - 학습 행 수: {metadata['train_rows']}
 - 검증 행 수: {metadata['validation_rows']}
 - 홀드아웃 테스트 행 수: {metadata['holdout_rows']}
-- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시
+- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시
 - 누수 방지: 같은 `source_case_number` 그룹이 학습/검증/홀드아웃에 동시에 들어가지 않도록 분리
 
 데이터 소스 분포:
@@ -348,6 +348,11 @@ def write_model_card(metadata: dict[str, object], learning_dir: Path = LEARNING_
 - 출력: `안전`, `주의`, `위험` 3개 등급의 모델 확률
 - 최종 앱 점수: Bagging 모델 확률과 명시적 위험 규칙을 혼합한 0~100점
 
+## 추가학습 구성
+
+- 학습 프로필: `{metadata.get('training_profile', 'unknown')}`
+- 보강 전략: {metadata.get('additional_training_strategy', '판례 파생 데이터와 공개 기준 기반 예시를 결합했다.')}
+
 ## 평가 결과
 
 Validation:
@@ -380,7 +385,7 @@ Holdout:
 def train_model(
     rebuild_data: bool = True,
     random_state: int = 42,
-    n_estimators: int = 240,
+    n_estimators: int = 320,
 ) -> dict[str, object]:
     df = load_training_frame(rebuild=rebuild_data)
     df = _prepare_features(df)
@@ -415,7 +420,8 @@ def train_model(
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "algorithm": "sklearn.ensemble.BaggingClassifier",
         "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-        "training_profile": "service_like_offline_demo",
+        "training_profile": "counterfactual_augmented_offline_demo",
+        "additional_training_strategy": "Added counterfactual safe/caution/danger stress examples and increased Bagging ensemble capacity while keeping grouped validation.",
         "random_state": random_state,
         "n_estimators": n_estimators,
         "model_path": str(MODEL_PATH),

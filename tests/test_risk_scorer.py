@@ -59,3 +59,52 @@ def test_trained_scorer_flags_high_and_low_risk():
     assert low["risk_score"] < 45
     assert low["risk_grade"] in {"안전", "주의"}
 
+
+def test_counterfactual_boundary_inputs_are_not_under_scored():
+    scorer = RiskScorer()
+    seizure_with_low_ratio = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 210,
+            "estimated_market_price_million": 510,
+            "mortgage_million": 15,
+            "seizure": True,
+            "provisional_seizure": True,
+            "guarantee_insurance_available": False,
+            "broker_explained_rights": False,
+            "special_clause_text": "압류는 곧 해제된다고만 설명하고 말소 조건은 없다.",
+        }
+    )
+    trust_with_low_debt = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "region": "수도권",
+            "deposit_million": 160,
+            "estimated_market_price_million": 330,
+            "trust_registered": True,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "broker_explained_rights": False,
+            "special_clause_text": "신탁원부와 수탁자 동의서는 계약 후 전달한다고 되어 있다.",
+        }
+    )
+    high_ratio_only = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "region": "비수도권",
+            "deposit_million": 205,
+            "estimated_market_price_million": 250,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": 8,
+        }
+    )
+    assert seizure_with_low_ratio["risk_grade"] == "위험"
+    assert trust_with_low_debt["risk_score"] >= 72
+    assert high_ratio_only["risk_grade"] == "주의"

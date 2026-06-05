@@ -19,6 +19,7 @@ def test_build_derived_contract_dataset_has_required_columns():
         variants_per_case=2,
         hard_examples=30,
         public_indicator_examples=30,
+        counterfactual_examples=30,
     )
     assert len(df) >= 900
     for column in MODEL_FEATURES + [TARGET_COLUMN]:
@@ -34,5 +35,9 @@ def test_build_derived_contract_dataset_has_required_columns():
             "public_indicator_safe",
             "public_indicator_caution",
             "public_indicator_danger",
+            "synthetic_counterfactual_safe",
+            "synthetic_counterfactual_caution",
+            "synthetic_counterfactual_danger",
         ]
     ).all()
+    assert df["source"].str.startswith("synthetic_counterfactual").any()

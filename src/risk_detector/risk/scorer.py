@@ -179,14 +179,14 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         if jeonse_ratio >= 0.90:
             add(23, "전세가율이 90% 이상이라 보증금 회수 여력이 낮습니다.", "danger", f"{jeonse_ratio:.1%}")
         elif jeonse_ratio >= 0.75:
-            add(13, "전세가율이 높은 편이라 주변 시세 재확인이 필요합니다.", "warning", f"{jeonse_ratio:.1%}")
+            add(18, "전세가율이 높은 편이라 주변 시세 재확인이 필요합니다.", "warning", f"{jeonse_ratio:.1%}")
         else:
             checks.append({"severity": "safe", "points": 0, "signal": "전세가율이 과도하지 않습니다.", "value": f"{jeonse_ratio:.1%}"})
 
     if debt_ratio >= 0.95:
         add(24, "보증금·근저당·선순위채권 합계가 시세에 근접하거나 초과합니다.", "danger", f"{debt_ratio:.1%}")
     elif debt_ratio >= 0.75:
-        add(14, "부채비율이 높아 선순위 권리 확인이 필요합니다.", "warning", f"{debt_ratio:.1%}")
+        add(18, "부채비율이 높아 선순위 권리 확인이 필요합니다.", "warning", f"{debt_ratio:.1%}")
 
     if contract.mortgage_million > 0:
         add(min(12, contract.mortgage_million / max(contract.estimated_market_price_million, 1) * 20), "등기부 을구에 근저당 또는 담보성 채권이 있습니다.", "warning", contract.mortgage_million)
@@ -261,6 +261,17 @@ class RiskScorer:
         # 최종 점수는 모델 확률과 규칙 점수를 혼합한다. 데모 목적상 법적 위험 신호 누락을 줄이는 쪽에 초점을 둔다.
         blended = model_score * 0.58 + rule_score * 0.42
         final_score = max(blended, rule_score * 0.84)
+        if contract.contract_type in {"jeonse", "monthly_rent"}:
+            jeonse_ratio = float(model_row["jeonse_ratio"])
+            debt_ratio = float(model_row["debt_ratio"])
+            if jeonse_ratio >= 0.80 and debt_ratio >= 0.80:
+                final_score = max(final_score, 40.0)
+        if contract.trust_registered and not contract.guarantee_insurance_available and not contract.broker_explained_rights:
+            final_score = max(final_score, 72.0)
+        if (contract.seizure or contract.provisional_seizure) and not contract.guarantee_insurance_available:
+            final_score = max(final_score, 78.0)
+        if contract.landlord_prior_incidents and not contract.guarantee_insurance_available:
+            final_score = max(final_score, 76.0)
         final_score = round(min(100.0, max(0.0, final_score)), 1)
         grade = grade_from_score(final_score)
         return {
