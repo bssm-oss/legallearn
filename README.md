@@ -142,7 +142,7 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 - 로컬 주소: `http://127.0.0.1:8765`
 - API health: `GET /api/health` 200, `model_exists=true`
 - API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 15.5점`, 고위험 기본 예시 `위험 86.0점`
-- 자동 테스트: `7 passed in 3.63s`
+- 자동 테스트: `7 passed in 3.86s`
 - 브라우저 콘솔: 메시지 없음
 - 데스크톱/모바일 캡처:
   - `학습과정/web_demo_desktop_final.png`

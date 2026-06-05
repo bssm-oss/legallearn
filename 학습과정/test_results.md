@@ -11,7 +11,7 @@ PYTHONPATH=src .venv/bin/python -m pytest
 결과:
 
 ```text
-7 passed in 3.63s
+7 passed in 3.86s
 ```
 
 ## 테스트 범위
