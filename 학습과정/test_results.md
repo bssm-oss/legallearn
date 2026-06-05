@@ -11,7 +11,7 @@ PYTHONPATH=src .venv/bin/python -m pytest
 결과:
 
 ```text
-8 passed in 4.75s
+8 passed in 5.22s
 ```
 
 ## 테스트 범위
@@ -23,6 +23,7 @@ PYTHONPATH=src .venv/bin/python -m pytest
 - 현실형 사례: 데이터셋에 없는 18개 사용자 시나리오 기준 점수 범위 확인
 - 반례 검증: 낮은 전세가율+압류, 낮은 부채비율+신탁, 높은 전세가율 단독 경계 입력 확인
 - 현장패턴 검증: 임대인 명의 불일치, 전입신고 지연/당일 근저당, 안전한 대리계약 확인
+- 자연어 신호 검증: 사용자 설명 문장에서 보호요건 완료 신호와 신탁·압류·체납·이중계약 치명 신호를 피처로 반영하는지 확인
 - 정상 계약 사례: 일부 안전 시나리오에서 Bagging 모델 단독 예측도 `안전`인지 확인
 
 ## 현실형 수동 시나리오 결과
@@ -66,9 +67,9 @@ PYTHONPATH=src .venv/bin/python scripts/run_web.py --host 127.0.0.1 --port 8765
 
 - `GET /api/health`: 200, `model_exists=true`
 - `GET /static/risk-illustration.svg`: 200, `image/svg+xml`
-- `POST /api/predict`: 200, 안전 대리계약 예시 `안전 34.4점`, 명의 불일치 대리계약 예시 `위험 74.0점`
-- 브라우저 콘솔: 메시지 없음
-- 네트워크: `/predict` POST 200, `risk-illustration.svg` GET 200
+- `POST /api/predict`: 200, 안전 대리계약 예시 `안전 15.5점`, 명의 불일치 대리계약 예시 `위험 74.0점`
+- Playwright 로드: 페이지 제목 `부동산 계약 위험 탐지`, 주요 입력 폼과 `위험도 분석` 버튼 렌더링 확인
+- 네트워크: `/api/predict` POST 200, `risk-illustration.svg` GET 200
 
 브라우저 캡처:
 

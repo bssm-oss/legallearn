@@ -1,6 +1,6 @@
 {
-  "rows": 100488,
-  "columns": 42,
+  "rows": 109488,
+  "columns": 46,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
@@ -10,28 +10,31 @@
     "synthetic_counterfactual_caution": 4800,
     "synthetic_counterfactual_safe": 4800,
     "synthetic_emerging_safe": 4500,
+    "synthetic_user_phrase_danger": 4500,
     "synthetic_emerging_caution": 4500,
     "synthetic_hard_caution": 3334,
     "synthetic_hard_danger": 3334,
     "synthetic_hard_safe": 3332,
+    "public_indicator_safe": 2400,
     "public_indicator_caution": 2400,
-    "public_indicator_safe": 2400
+    "synthetic_user_phrase_caution": 2250,
+    "synthetic_user_phrase_safe": 2250
   },
   "label_counts": {
-    "0": 33508,
-    "1": 31218,
-    "2": 35762
+    "0": 35758,
+    "1": 33468,
+    "2": 40262
   },
   "contract_type_counts": {
-    "jeonse": 51846,
+    "jeonse": 59346,
     "sale": 27821,
-    "monthly_rent": 20821
+    "monthly_rent": 22321
   },
   "property_type_counts": {
-    "apartment": 31602,
-    "villa": 28622,
-    "officetel": 19842,
-    "multi_family": 17594,
+    "apartment": 35352,
+    "villa": 30122,
+    "officetel": 21342,
+    "multi_family": 19844,
     "commercial": 2828
   },
   "missing_by_column": {
@@ -76,26 +79,30 @@
     "legal_category": 0,
     "combined_text": 0,
     "heuristic_risk_score": 0,
-    "risk_label": 0
+    "risk_label": 0,
+    "safety_term_count": 0,
+    "critical_term_count": 0,
+    "has_safety_signal": 0,
+    "has_critical_signal": 0
   },
   "duplicate_rows": 0,
   "jeonse_ratio_quantiles": {
     "0.0": 0.0355,
-    "0.25": 0.1217,
-    "0.5": 0.4421,
-    "0.75": 0.7314,
-    "0.9": 0.8599,
-    "0.99": 1.0751,
+    "0.25": 0.1286,
+    "0.5": 0.4632,
+    "0.75": 0.7266,
+    "0.9": 0.8519,
+    "0.99": 1.0727,
     "1.0": 1.1799
   },
   "debt_ratio_quantiles": {
     "0.0": 0.0522,
-    "0.25": 0.3331,
-    "0.5": 0.6622,
-    "0.75": 0.9659,
-    "0.9": 1.2063,
-    "0.99": 1.7373,
+    "0.25": 0.3581,
+    "0.5": 0.6624,
+    "0.75": 0.949,
+    "0.9": 1.1857,
+    "0.99": 1.7259,
     "1.0": 2.0893
   },
-  "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시를 결합했다. 실제 피해자 원천 기록은 아니다."
+  "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시, 사용자 자연어 입력 변형 예시를 결합했다. 실제 피해자 원천 기록은 아니다."
 }
