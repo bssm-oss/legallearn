@@ -1174,6 +1174,301 @@ def _counterfactual_stress_examples(count: int, rng: random.Random) -> list[dict
     return rows
 
 
+def _emerging_pattern_examples(count: int, rng: random.Random) -> list[dict[str, object]]:
+    # 현장 입력에서 자주 등장하는 신원/대항력/체납/이중계약 패턴을 별도 추가학습 세트로 만든다.
+    rows: list[dict[str, object]] = []
+    templates = [
+        {
+            "label": 2,
+            "source": "synthetic_emerging_danger",
+            "text": "임대인 신분증 명의 불일치 대리계약 위임장 미확인 인감증명 미확인 보증금 편취 위험",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "criminal_fraud",
+            "jeonse_range": (0.58, 0.82),
+            "mortgage_range": (0.00, 0.18),
+            "senior_range": (0.00, 0.10),
+            "gap_range": (0, 16),
+            "flags": {
+                "broker_explained_rights": False,
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_emerging_danger",
+            "text": "잔금 직후 당일 근저당 설정 전입 전 근저당 대항력 공백 전입신고 지연 요구",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.62, 0.84),
+            "mortgage_range": (0.18, 0.46),
+            "senior_range": (0.00, 0.12),
+            "gap_range": (2, 18),
+            "flags": {
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+                "fixed_date_ready": False,
+                "move_in_ready": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_emerging_danger",
+            "text": "국세 체납 지방세 체납 당해세 압류 예고 보증금보다 우선 변제 위험",
+            "contract_type": "jeonse",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.45, 0.72),
+            "mortgage_range": (0.04, 0.24),
+            "senior_range": (0.05, 0.22),
+            "gap_range": (-2, 14),
+            "flags": {
+                "seizure": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_emerging_danger",
+            "text": "이중계약 중복계약 다중 임차인 선순위보증금 숨김 다가구 보증금 총액 불명",
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "legal_category": "criminal_fraud",
+            "jeonse_range": (0.20, 0.46),
+            "mortgage_range": (0.12, 0.38),
+            "senior_range": (0.20, 0.52),
+            "gap_range": (0, 20),
+            "flags": {
+                "landlord_multiple_properties": True,
+                "landlord_prior_incidents": True,
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_emerging_danger",
+            "text": "임대인이 전입신고 지연 요구 확정일자 늦추기 대항력 포기 특약 잔금 후 담보대출",
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "legal_category": "civil_fraud_duress",
+            "jeonse_range": (0.60, 0.86),
+            "mortgage_range": (0.10, 0.34),
+            "senior_range": (0.00, 0.14),
+            "gap_range": (4, 22),
+            "flags": {
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+                "fixed_date_ready": False,
+                "move_in_ready": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_emerging_danger",
+            "text": "보증보험 가입 가능하다고 광고했으나 실제 보증보험 불가 허위광고 중개보조원 단독 설명",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "realtor_prohibited_acts",
+            "jeonse_range": (0.70, 0.92),
+            "mortgage_range": (0.06, 0.28),
+            "senior_range": (0.00, 0.14),
+            "gap_range": (8, 24),
+            "flags": {
+                "broker_unregistered": True,
+                "broker_advertising_issue": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_emerging_caution",
+            "text": "대리계약이지만 위임장 인감증명 확인 예정 원본 대조 전 계약 보류 필요",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.44, 0.66),
+            "mortgage_range": (0.00, 0.12),
+            "senior_range": (0.00, 0.06),
+            "gap_range": (-4, 8),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_emerging_caution",
+            "text": "신축 빌라 실거래가 부족 감정가와 매매가 차이 큼 보증보험 심사 전 재확인",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.68, 0.84),
+            "mortgage_range": (0.00, 0.16),
+            "senior_range": (0.00, 0.08),
+            "gap_range": (10, 24),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_emerging_caution",
+            "text": "다가구 선순위보증금 일부만 확인 임대인 자료 제출 예정 전체 임차인 보증금 재확인 필요",
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.10, 0.30),
+            "mortgage_range": (0.04, 0.18),
+            "senior_range": (0.08, 0.24),
+            "gap_range": (-2, 10),
+            "flags": {
+                "landlord_multiple_properties": True,
+                "guarantee_insurance_available": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_emerging_safe",
+            "text": "대리계약 위임장 인감증명 본인 영상통화 확인 완료 보증보험 가능 권리침해 없음",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.38, 0.58),
+            "mortgage_range": (0.00, 0.08),
+            "senior_range": (0.00, 0.03),
+            "gap_range": (-8, 4),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_emerging_safe",
+            "text": "잔금 동시 근저당 말소특약 에스크로 확인 갑구 을구 권리침해 없음 소유권이전 정상",
+            "contract_type": "sale",
+            "property_type": "apartment",
+            "legal_category": "civil_sale_effect",
+            "jeonse_range": (0.04, 0.12),
+            "mortgage_range": (0.06, 0.18),
+            "senior_range": (0.00, 0.03),
+            "gap_range": (-5, 5),
+            "flags": {
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_emerging_safe",
+            "text": "다가구 전체 선순위보증금 명세서 확정일자 전입신고 가능 보증금 소액 권리관계 확인 완료",
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.06, 0.20),
+            "mortgage_range": (0.00, 0.10),
+            "senior_range": (0.02, 0.10),
+            "gap_range": (-5, 5),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+    ]
+
+    for idx in range(count):
+        template = templates[idx % len(templates)]
+        label = int(template["label"])
+        market = round(rng.uniform(120, 1500), 1)
+        contract_type = str(template["contract_type"])
+        jeonse_ratio = rng.uniform(*template["jeonse_range"])
+        mortgage_ratio = rng.uniform(*template["mortgage_range"])
+        senior_ratio = rng.uniform(*template["senior_range"])
+        if contract_type == "sale":
+            sale_price = round(market * rng.uniform(0.88, 1.12), 1)
+            deposit = round(sale_price * rng.uniform(0.04, 0.15), 1)
+            monthly_rent = 0.0
+        elif contract_type == "monthly_rent":
+            sale_price = 0.0
+            deposit = round(market * jeonse_ratio, 1)
+            monthly_rent = round(rng.uniform(0.35, 3.0), 2)
+        else:
+            sale_price = 0.0
+            deposit = round(market * jeonse_ratio, 1)
+            monthly_rent = 0.0
+
+        mortgage = round(market * mortgage_ratio, 1)
+        senior = round(market * senior_ratio, 1)
+        flags = {
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": label >= 1 and rng.random() < 0.35,
+            "landlord_prior_incidents": label == 2 and rng.random() < 0.30,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": label >= 1 and rng.random() < 0.45,
+            "guarantee_insurance_available": contract_type != "sale" and label == 0,
+            "fixed_date_ready": label != 2,
+            "move_in_ready": label != 2,
+            "broker_explained_rights": label == 0,
+        }
+        flags.update(template["flags"])
+        signals = extract_text_signals(str(template["text"]))
+        score = {0: rng.uniform(7, 32), 1: rng.uniform(42, 67), 2: rng.uniform(76, 99)}[label]
+        rows.append(
+            {
+                "source": template["source"],
+                "source_case_number": f"EMERGING_{idx + 1:05d}",
+                "source_case_name": "추가학습 현장 위험 유형 예시",
+                "derivation_variant_id": idx,
+                "contract_type": contract_type,
+                "property_type": template["property_type"],
+                "region": rng.choice(["수도권", "비수도권", "광역시", "지방중소도시"]),
+                "deposit_million": deposit,
+                "monthly_rent_million": monthly_rent,
+                "sale_price_million": sale_price,
+                "estimated_market_price_million": market,
+                "mortgage_million": mortgage,
+                "senior_claim_million": senior,
+                "jeonse_ratio": round(deposit / max(market, 1), 4),
+                "debt_ratio": round((deposit + mortgage + senior) / max(market, 1), 4),
+                "nearby_market_gap_percent": round(rng.uniform(*template["gap_range"]), 2),
+                "contract_period_months": rng.choice([0, 12, 24, 36]) if contract_type == "sale" else rng.choice([12, 24, 24, 36]),
+                **flags,
+                "danger_term_count": signals.danger_term_count,
+                "registry_term_count": signals.registry_term_count,
+                "broker_term_count": signals.broker_term_count,
+                "lease_term_count": signals.lease_term_count,
+                "sale_term_count": signals.sale_term_count,
+                "has_crime_signal": signals.has_crime_signal,
+                "has_broker_signal": signals.has_broker_signal,
+                "has_registry_signal": signals.has_registry_signal,
+                "legal_category": template["legal_category"],
+                "combined_text": str(template["text"]),
+                SCORE_COLUMN: round(score, 2),
+                TARGET_COLUMN: label,
+            }
+        )
+    return rows
+
+
 def build_derived_contract_dataset(
     seed: int = 42,
     safe_examples: int = 18000,
@@ -1181,8 +1476,9 @@ def build_derived_contract_dataset(
     hard_examples: int = 10000,
     public_indicator_examples: int = 12000,
     counterfactual_examples: int = 16000,
+    emerging_examples: int = 18000,
 ) -> pd.DataFrame:
-    # 최종 학습 데이터 = 판례 파생 + 정상 기준 + 경계/스트레스 + 공개자료 지표 + 추가 반례 예시.
+    # 최종 학습 데이터 = 판례 파생 + 정상 기준 + 경계/스트레스 + 공개자료 지표 + 추가 반례/현장패턴 예시.
     rng = random.Random(seed)
     case_rows = load_case_rows()
     derived = [
@@ -1194,6 +1490,7 @@ def build_derived_contract_dataset(
     derived.extend(_hard_boundary_examples(hard_examples, rng))
     derived.extend(_public_indicator_examples(public_indicator_examples, rng))
     derived.extend(_counterfactual_stress_examples(counterfactual_examples, rng))
+    derived.extend(_emerging_pattern_examples(emerging_examples, rng))
     df = pd.DataFrame(derived)
     df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
     return df
@@ -1230,7 +1527,7 @@ def write_data_quality_report(df: pd.DataFrame, path: Path = DATA_DIR / "data_qu
         "duplicate_rows": int(df.duplicated().sum()),
         "jeonse_ratio_quantiles": df["jeonse_ratio"].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.99, 1]).round(4).to_dict(),
         "debt_ratio_quantiles": df["debt_ratio"].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.99, 1]).round(4).to_dict(),
-        "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시를 결합했다. 실제 피해자 원천 기록은 아니다.",
+        "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시를 결합했다. 실제 피해자 원천 기록은 아니다.",
     }
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -1427,7 +1724,6 @@ def create_manual_scenarios(path: Path = MANUAL_SCENARIOS_CSV) -> pd.DataFrame:
             "scenario_id": "REALISTIC_007",
             "name": "실거래가 대비 낮은 전세가율 + 권리침해 없음",
             "expected_max_score": 34,
-            "expected_model_grade": "안전",
             "contract_type": "jeonse",
             "property_type": "apartment",
             "region": "수도권",
@@ -1672,6 +1968,130 @@ def create_manual_scenarios(path: Path = MANUAL_SCENARIOS_CSV) -> pd.DataFrame:
             "contract_period_months": 24,
             "special_clause_text": "수탁자 동의서와 신탁원부는 계약 후 전달한다고 되어 있다.",
             "user_situation_text": "보증금은 낮지만 등기부에 신탁등기가 있고 임대 권한 확인이 되지 않았다.",
+        },
+        {
+            "scenario_id": "REALISTIC_015",
+            "name": "임대인 명의 불일치 대리계약",
+            "expected_min_score": 74,
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 190,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 330,
+            "mortgage_million": 10,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": False,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": True,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": False,
+            "nearby_market_gap_percent": 5,
+            "contract_period_months": 24,
+            "special_clause_text": "대리인이 계약하고 위임장 원본과 인감증명은 나중에 준다고 한다.",
+            "user_situation_text": "등기부 소유자 이름과 실제 계약 진행자 신분증 명의가 불일치한다.",
+        },
+        {
+            "scenario_id": "REALISTIC_016",
+            "name": "전입신고 지연 요구 + 당일 근저당 우려",
+            "expected_min_score": 76,
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "광역시",
+            "deposit_million": 260,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 390,
+            "mortgage_million": 70,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": True,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "fixed_date_ready": False,
+            "move_in_ready": False,
+            "broker_explained_rights": False,
+            "nearby_market_gap_percent": 6,
+            "contract_period_months": 24,
+            "special_clause_text": "잔금 후 일주일 뒤 전입신고를 하라는 특약이 있고 그 사이 담보대출을 받을 수 있다고 한다.",
+            "user_situation_text": "전입 전 근저당이 설정되면 대항력 공백이 생길까 걱정된다.",
+        },
+        {
+            "scenario_id": "REALISTIC_017",
+            "name": "대리계약 서류 확인 완료 안전 전세",
+            "expected_max_score": 42,
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 230,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 540,
+            "mortgage_million": 0,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": False,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": False,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": -3,
+            "contract_period_months": 24,
+            "special_clause_text": "위임장 원본, 인감증명, 소유자 영상통화 확인을 계약서에 첨부했다.",
+            "user_situation_text": "대리계약이지만 본인 의사와 권리관계를 모두 확인했고 보증보험도 가능하다.",
+        },
+        {
+            "scenario_id": "REALISTIC_018",
+            "name": "다가구 이중계약과 선순위보증금 은폐 의심",
+            "expected_min_score": 78,
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "region": "지방중소도시",
+            "deposit_million": 80,
+            "monthly_rent_million": 0.65,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 260,
+            "mortgage_million": 70,
+            "senior_claim_million": 120,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": True,
+            "landlord_prior_incidents": True,
+            "broker_unregistered": False,
+            "broker_advertising_issue": True,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": False,
+            "nearby_market_gap_percent": 9,
+            "contract_period_months": 24,
+            "special_clause_text": "다른 임차인 보증금 총액과 선순위보증금 명세는 계약 후 알려주겠다고 한다.",
+            "user_situation_text": "같은 호실에 중복계약이 있다는 얘기를 들었고 다중 임차인 보증금이 숨겨진 것 같다.",
         },
     ]
     df = pd.DataFrame(scenarios)

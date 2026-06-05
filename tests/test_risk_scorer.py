@@ -108,3 +108,59 @@ def test_counterfactual_boundary_inputs_are_not_under_scored():
     assert seizure_with_low_ratio["risk_grade"] == "위험"
     assert trust_with_low_debt["risk_score"] >= 72
     assert high_ratio_only["risk_grade"] == "주의"
+
+
+def test_emerging_text_risk_patterns_are_handled():
+    scorer = RiskScorer()
+    identity_mismatch = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 190,
+            "estimated_market_price_million": 330,
+            "broker_advertising_issue": True,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "broker_explained_rights": False,
+            "special_clause_text": "대리인이 계약하고 위임장 미확인 상태이며 인감증명 미확인이다.",
+            "user_situation_text": "등기부 소유자와 계약 진행자 신분증 명의 불일치가 있다.",
+        }
+    )
+    delayed_move_in = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "광역시",
+            "deposit_million": 260,
+            "estimated_market_price_million": 390,
+            "mortgage_million": 70,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "fixed_date_ready": False,
+            "move_in_ready": False,
+            "broker_explained_rights": False,
+            "special_clause_text": "잔금 후 전입신고 지연 요구가 있고 잔금 후 담보대출 가능성이 있다.",
+            "user_situation_text": "전입 전 근저당 설정으로 대항력 공백이 생길 수 있다.",
+        }
+    )
+    verified_proxy = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 230,
+            "estimated_market_price_million": 540,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "special_clause_text": "위임장 원본, 인감증명, 소유자 영상통화 확인을 계약서에 첨부했다.",
+            "user_situation_text": "대리계약이지만 본인 의사와 권리관계를 모두 확인했다.",
+        }
+    )
+    assert identity_mismatch["risk_score"] >= 74
+    assert identity_mismatch["risk_grade"] == "위험"
+    assert delayed_move_in["risk_score"] >= 76
+    assert delayed_move_in["risk_grade"] == "위험"
+    assert verified_proxy["risk_score"] < 45

@@ -53,7 +53,7 @@ def _prepare_features(df: pd.DataFrame) -> pd.DataFrame:
     return prepared
 
 
-def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 320) -> Pipeline:
+def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 400) -> Pipeline:
     # 수치, 범주, 불리언, 텍스트를 각각 전처리한 뒤 BaggingClassifier가 함께 학습한다.
     numeric_pipeline = Pipeline(
         steps=[
@@ -72,7 +72,7 @@ def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 320) -> P
             (
                 "tfidf",
                 TfidfVectorizer(
-                    max_features=3200,
+                    max_features=4200,
                     ngram_range=(1, 2),
                     min_df=2,
                     sublinear_tf=True,
@@ -89,7 +89,7 @@ def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 320) -> P
         ]
     )
     tree = DecisionTreeClassifier(
-        max_depth=15,
+        max_depth=16,
         min_samples_leaf=6,
         class_weight="balanced",
         random_state=random_state,
@@ -97,8 +97,8 @@ def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 320) -> P
     classifier = BaggingClassifier(
         estimator=tree,
         n_estimators=n_estimators,
-        max_samples=0.86,
-        max_features=0.92,
+        max_samples=0.88,
+        max_features=0.94,
         bootstrap=True,
         bootstrap_features=False,
         n_jobs=-1,
@@ -255,7 +255,7 @@ def write_training_report(
 - 학습 행 수: {metadata['train_rows']}
 - 검증 행 수: {metadata['validation_rows']}
 - 홀드아웃 테스트 행 수: {metadata['holdout_rows']}
-- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시
+- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시
 - 누수 방지: 같은 `source_case_number` 그룹이 학습/검증/홀드아웃에 동시에 들어가지 않도록 분리
 
 데이터 소스 분포:
@@ -382,10 +382,38 @@ Holdout:
     (learning_dir / "model_card.md").write_text(card, encoding="utf-8")
 
 
+def write_manual_scenario_predictions(learning_dir: Path = LEARNING_DIR) -> None:
+    # 재학습할 때마다 사용자형 수동 시나리오 예측 결과를 함께 갱신해 문서와 테스트 산출물이 어긋나지 않게 한다.
+    from risk_detector.risk.scorer import RiskScorer
+
+    if not MANUAL_SCENARIOS_CSV.exists() or not MODEL_PATH.exists():
+        return
+    scenarios = pd.read_csv(MANUAL_SCENARIOS_CSV, encoding="utf-8-sig")
+    scorer = RiskScorer()
+    rows: list[dict[str, object]] = []
+    for _, row in scenarios.iterrows():
+        payload = row.dropna().to_dict()
+        result = scorer.score(payload)
+        probabilities = result["model_probabilities"]
+        rows.append(
+            {
+                "scenario_id": row["scenario_id"],
+                "name": row["name"],
+                "risk_score": result["risk_score"],
+                "risk_grade": result["risk_grade"],
+                "model_predicted_grade": result["model_predicted_grade"],
+                "prob_safe": probabilities.get("안전", 0.0),
+                "prob_caution": probabilities.get("주의", 0.0),
+                "prob_danger": probabilities.get("위험", 0.0),
+            }
+        )
+    pd.DataFrame(rows).to_csv(learning_dir / "manual_scenario_predictions.csv", index=False, encoding="utf-8-sig")
+
+
 def train_model(
     rebuild_data: bool = True,
     random_state: int = 42,
-    n_estimators: int = 320,
+    n_estimators: int = 400,
 ) -> dict[str, object]:
     df = load_training_frame(rebuild=rebuild_data)
     df = _prepare_features(df)
@@ -420,8 +448,8 @@ def train_model(
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "algorithm": "sklearn.ensemble.BaggingClassifier",
         "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-        "training_profile": "counterfactual_augmented_offline_demo",
-        "additional_training_strategy": "Added counterfactual safe/caution/danger stress examples and increased Bagging ensemble capacity while keeping grouped validation.",
+        "training_profile": "emerging_pattern_augmented_offline_demo",
+        "additional_training_strategy": "Added counterfactual and emerging field-pattern examples for identity mismatch, delayed move-in/same-day mortgage, tax arrears, double contracts, and verified safe proxy contracts; increased Bagging ensemble capacity while keeping grouped validation.",
         "random_state": random_state,
         "n_estimators": n_estimators,
         "model_path": str(MODEL_PATH),
@@ -451,6 +479,7 @@ def train_model(
     (LEARNING_DIR / "training_audit.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
     write_training_report(metrics, validation_metrics, df, metadata)
     write_model_card(metadata)
+    write_manual_scenario_predictions()
     return metadata
 
 

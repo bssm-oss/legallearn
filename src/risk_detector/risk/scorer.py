@@ -165,12 +165,23 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
     score = 12.0
     reasons: list[str] = []
     checks: list[dict[str, Any]] = []
+    combined_text = f"{contract.special_clause_text} {contract.user_situation_text}"
 
     def add(points: float, label: str, severity: str, value: Any) -> None:
         nonlocal score
         score += points
         reasons.append(label)
         checks.append({"severity": severity, "points": points, "signal": label, "value": value})
+
+    def has_any(terms: list[str]) -> bool:
+        return any(term in combined_text for term in terms)
+
+    identity_mismatch = has_any(["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
+        "불일치" in combined_text and any(term in combined_text for term in ["명의", "신분증", "소유자"])
+    )
+    proxy_docs_deferred = any(term in combined_text for term in ["나중", "계약 후", "추후"]) and any(
+        term in combined_text for term in ["위임장", "인감증명", "대리권"]
+    )
 
     jeonse_ratio = float(model_row["jeonse_ratio"])
     debt_ratio = float(model_row["debt_ratio"])
@@ -222,6 +233,14 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(9, "중개대상물 확인·설명이 충분하지 않은 것으로 입력되었습니다.", "warning", False)
     if abs(contract.nearby_market_gap_percent) >= 15:
         add(12, "주변 시세 대비 보증금/가격 괴리가 큽니다.", "warning", f"{contract.nearby_market_gap_percent:.1f}%")
+    if identity_mismatch or proxy_docs_deferred:
+        add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
+    if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
+        add(20, "전입·확정일자 전 권리공백 또는 당일 담보 설정 위험이 있습니다.", "danger", True)
+    if has_any(["국세 체납", "지방세 체납", "당해세", "체납 압류"]):
+        add(18, "임대인의 세금 체납 또는 당해세 우선 변제 위험이 의심됩니다.", "danger", True)
+    if has_any(["이중계약", "중복계약", "선순위보증금 숨김", "다중 임차인"]):
+        add(22, "이중계약 또는 선순위보증금 은폐 가능성이 있습니다.", "danger", True)
 
     if not reasons:
         reasons.append("입력된 핵심 위험 신호가 낮은 편입니다. 그래도 등기부등본, 건축물대장, 보증보험 가능 여부는 계약 직전 재확인해야 합니다.")
@@ -272,6 +291,21 @@ class RiskScorer:
             final_score = max(final_score, 78.0)
         if contract.landlord_prior_incidents and not contract.guarantee_insurance_available:
             final_score = max(final_score, 76.0)
+        text = f"{contract.special_clause_text} {contract.user_situation_text}"
+        identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
+            "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
+        )
+        proxy_docs_deferred = any(term in text for term in ["나중", "계약 후", "추후"]) and any(
+            term in text for term in ["위임장", "인감증명", "대리권"]
+        )
+        if identity_mismatch or proxy_docs_deferred:
+            final_score = max(final_score, 74.0)
+        if any(term in text for term in ["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
+            final_score = max(final_score, 76.0)
+        if any(term in text for term in ["국세 체납", "지방세 체납", "당해세", "체납 압류"]):
+            final_score = max(final_score, 72.0)
+        if any(term in text for term in ["이중계약", "중복계약", "선순위보증금 숨김", "다중 임차인"]):
+            final_score = max(final_score, 78.0)
         final_score = round(min(100.0, max(0.0, final_score)), 1)
         grade = grade_from_score(final_score)
         return {
