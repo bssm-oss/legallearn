@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Real estate contract risk analysis illustration</title>
+  <desc id="desc">A clean product illustration with a building, checklist, shield, and analytics cards.</desc>
+  <rect width="960" height="540" rx="28" fill="#f8fafc"/>
+  <rect x="62" y="62" width="836" height="416" rx="22" fill="#ffffff" stroke="#dfe3ea" stroke-width="2"/>
+  <rect x="98" y="102" width="282" height="316" rx="18" fill="#f2f6fb" stroke="#dfe3ea"/>
+  <path d="M152 392V188l88-54 88 54v204" fill="#ffffff" stroke="#111827" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M130 392h220" stroke="#111827" stroke-width="8" stroke-linecap="round"/>
+  <rect x="178" y="216" width="38" height="38" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+  <rect x="264" y="216" width="38" height="38" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>
+  <rect x="178" y="286" width="38" height="38" rx="6" fill="#ecfdf5" stroke="#0f766e" stroke-width="3"/>
+  <rect x="264" y="286" width="38" height="38" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="3"/>
+  <rect x="222" y="348" width="36" height="44" rx="6" fill="#111827"/>
+  <rect x="430" y="102" width="386" height="96" rx="16" fill="#ffffff" stroke="#dfe3ea"/>
+  <circle cx="470" cy="150" r="17" fill="#0f766e"/>
+  <path d="M461 150l7 7 14-18" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="510" y="126" width="170" height="12" rx="6" fill="#111827"/>
+  <rect x="510" y="158" width="246" height="10" rx="5" fill="#cbd5e1"/>
+  <rect x="430" y="222" width="182" height="196" rx="16" fill="#ffffff" stroke="#dfe3ea"/>
+  <path d="M521 262l58 24v43c0 44-27 68-58 80-31-12-58-36-58-80v-43z" fill="#eff6ff" stroke="#2563eb" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M493 330l19 19 42-55" fill="none" stroke="#0f766e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="634" y="222" width="182" height="196" rx="16" fill="#ffffff" stroke="#dfe3ea"/>
+  <path d="M676 374V326" stroke="#2563eb" stroke-width="18" stroke-linecap="round"/>
+  <path d="M724 374V282" stroke="#0f766e" stroke-width="18" stroke-linecap="round"/>
+  <path d="M772 374V246" stroke="#dc2626" stroke-width="18" stroke-linecap="round"/>
+  <path d="M660 378h132" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+  <rect x="650" y="248" width="44" height="10" rx="5" fill="#cbd5e1"/>
+  <rect x="650" y="268" width="88" height="10" rx="5" fill="#cbd5e1"/>
+  <rect x="430" y="438" width="386" height="20" rx="10" fill="#e5e7eb"/>
+  <rect x="430" y="438" width="276" height="20" rx="10" fill="#2563eb"/>
+  <circle cx="706" cy="448" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="6"/>
+</svg>
