@@ -15,11 +15,11 @@
 
 ## 서비스형 학습 구성
 
-- 전체 학습 데이터 행 수: 123488
-- 학습 행 수: 81099
-- 검증 행 수: 17885
-- 홀드아웃 테스트 행 수: 24504
-- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시 + 사용자 자연어 입력 변형 예시 + 구어체 텍스트-only 입력 예시 + 계좌·계약금·건축물 텍스트-only 예시
+- 전체 학습 데이터 행 수: 126488
+- 학습 행 수: 83148
+- 검증 행 수: 18155
+- 홀드아웃 테스트 행 수: 25185
+- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시 + 사용자 자연어 입력 변형 예시 + 구어체 텍스트-only 입력 예시 + 계좌·계약금·건축물 텍스트-only 예시 + 전대차·임차권등기·미등기·가계약금 텍스트-only 예시
 - 누수 방지: 같은 `source_case_number` 그룹이 학습/검증/홀드아웃에 동시에 들어가지 않도록 분리
 
 데이터 소스 분포:
@@ -32,39 +32,42 @@
   "synthetic_counterfactual_danger": 6400,
   "synthetic_counterfactual_safe": 4800,
   "synthetic_counterfactual_caution": 4800,
-  "synthetic_user_phrase_danger": 4500,
-  "synthetic_emerging_caution": 4500,
   "synthetic_emerging_safe": 4500,
+  "synthetic_emerging_caution": 4500,
+  "synthetic_user_phrase_danger": 4500,
   "synthetic_colloquial_danger": 4305,
-  "synthetic_hard_danger": 3334,
   "synthetic_hard_caution": 3334,
-  "synthetic_payment_building_danger": 3332,
+  "synthetic_hard_danger": 3334,
   "synthetic_hard_safe": 3332,
-  "public_indicator_caution": 2400,
+  "synthetic_payment_building_danger": 3332,
   "public_indicator_safe": 2400,
+  "public_indicator_caution": 2400,
   "synthetic_user_phrase_caution": 2250,
   "synthetic_user_phrase_safe": 2250,
   "synthetic_colloquial_safe": 1848,
   "synthetic_colloquial_caution": 1847,
+  "synthetic_tenancy_title_danger": 1500,
+  "synthetic_payment_building_safe": 1334,
   "synthetic_payment_building_caution": 1334,
-  "synthetic_payment_building_safe": 1334
+  "synthetic_tenancy_title_caution": 750,
+  "synthetic_tenancy_title_safe": 750
 }
 
 계약 유형 분포:
 
 {
-  "jeonse": 69448,
-  "sale": 28437,
-  "monthly_rent": 25603
+  "jeonse": 71665,
+  "sale": 28445,
+  "monthly_rent": 26378
 }
 
 주택 유형 분포:
 
 {
-  "apartment": 39097,
-  "villa": 34583,
-  "officetel": 23239,
-  "multi_family": 23075,
+  "apartment": 39897,
+  "villa": 36192,
+  "officetel": 23911,
+  "multi_family": 22994,
   "commercial": 3494
 }
 
@@ -72,11 +75,11 @@
 
 {
   "0.0": 6.0,
-  "0.25": 28.02,
-  "0.5": 56.18,
-  "0.75": 83.39,
-  "0.9": 94.53,
-  "0.99": 98.14,
+  "0.25": 28.05,
+  "0.5": 56.45,
+  "0.75": 83.58,
+  "0.9": 94.6,
+  "0.99": 98.16,
   "1.0": 99.0
 }
 
@@ -93,27 +96,27 @@ Bagging은 여러 개의 결정트리를 bootstrap 표본으로 학습하고 예
 ## 데이터 분포
 
 {
-  "안전": 38940,
-  "주의": 36649,
-  "위험": 47899
+  "안전": 39662,
+  "주의": 37399,
+  "위험": 49427
 }
 
 ## 평가 결과
 
-- Accuracy: 0.9837
-- Balanced Accuracy: 0.983
-- Macro F1: 0.9826
-- Weighted F1: 0.9837
-- Macro Precision: 0.9824
-- Macro Recall: 0.983
-- Test rows: 24504
+- Accuracy: 0.9813
+- Balanced Accuracy: 0.9807
+- Macro F1: 0.9803
+- Weighted F1: 0.9814
+- Macro Precision: 0.9803
+- Macro Recall: 0.9807
+- Test rows: 25185
 
 ## 검증 분리 방식
 
 - 같은 판례 번호에서 파생된 변형 데이터가 학습/검증/테스트에 동시에 들어가지 않도록 `source_case_number` 기준 그룹 분리를 적용했다.
-- Validation rows: 17885
-- Validation Macro F1: 0.995
-- Holdout rows: 24504
+- Validation rows: 18155
+- Validation Macro F1: 0.988
+- Holdout rows: 25185
 
 상세 결과:
 - `학습과정/classification_report.txt`

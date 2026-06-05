@@ -25,3 +25,7 @@ REALISTIC_023,계약금 계좌 명의 불일치 텍스트 입력,74.0,jeonse,vil
 REALISTIC_024,불법증축 쪼개기 의심 텍스트 입력,70.0,monthly_rent,multi_family,수도권,70,0.7,0,240,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,원룸이 불법증축 쪼개기 방일 수 있다는데 건축물대장은 아직 못 봤습니다.,
 REALISTIC_025,법인 임대인 대표 개인계좌 요구,74.0,jeonse,officetel,수도권,220,0.0,0,330,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인이 법인인데 보증금 일부를 대표 개인계좌로 보내라고 합니다.,
 REALISTIC_026,등기부 확인 전 계약금 선입금 압박,64.0,jeonse,villa,수도권,230,0.0,0,310,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,오늘 계약금 먼저 넣어야 잡아준다고 하고 등기부는 나중에 보자고 합니다.,
+REALISTIC_027,임대인 동의 없는 기존 세입자 전대차,70.0,monthly_rent,officetel,수도권,50,0.8,0,240,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,집주인이 아니라 기존 세입자가 전대차로 계약하자고 합니다. 임대인 동의서는 없고 전입신고는 가능하다고만 해요.,
+REALISTIC_028,임차권등기명령 말소 미확인,72.0,jeonse,apartment,수도권,250,0.0,0,520,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,등기부에 임차권등기명령이 남아 있는데 전 세입자와는 해결됐다고만 합니다.,
+REALISTIC_029,사용승인 전 미등기 신축,74.0,jeonse,villa,수도권,230,0.0,0,330,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,신축인데 아직 미등기이고 사용승인 전이라 등기부등본이 없다고 합니다.,
+REALISTIC_030,계약서 전 가계약금 환불불가 요구,64.0,jeonse,villa,수도권,210,0.0,0,330,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,가계약금 넣으면 환불불가라고 하고 계약서 보기 전 먼저 송금하라고 합니다.,
