@@ -216,3 +216,72 @@ def test_colloquial_text_only_inputs_are_not_missed():
     assert text_only_trust["risk_score"] >= 72
     assert colloquial_safe["risk_score"] < 45
     assert colloquial_safe["risk_grade"] == "안전"
+
+
+def test_payment_account_and_building_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    account_mismatch = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 190,
+            "estimated_market_price_million": 360,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "계약금은 집주인 말고 다른 사람 계좌로 보내래요. 계좌 명의가 임대인 이름이 아닙니다.",
+        }
+    )
+    illegal_split = scorer.score(
+        {
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "region": "수도권",
+            "deposit_million": 70,
+            "monthly_rent_million": 0.7,
+            "estimated_market_price_million": 240,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "원룸이 불법증축 쪼개기 방일 수 있다는데 건축물대장은 아직 못 봤습니다.",
+        }
+    )
+    pressure_deposit = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 230,
+            "estimated_market_price_million": 310,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "오늘 계약금 먼저 넣어야 잡아준다고 하고 등기부는 나중에 보자고 합니다.",
+        }
+    )
+    safe_verified_payment = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 220,
+            "estimated_market_price_million": 560,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "임대인 계좌 일치 소유자 계좌 확인 완료 계약금 보류 등기부 확인 완료 건축물대장 확인 완료 건축물대장 정상입니다.",
+        }
+    )
+    assert account_mismatch["risk_grade"] == "위험"
+    assert account_mismatch["risk_score"] >= 74
+    assert illegal_split["risk_grade"] == "위험"
+    assert illegal_split["risk_score"] >= 70
+    assert pressure_deposit["risk_grade"] in {"주의", "위험"}
+    assert pressure_deposit["risk_score"] >= 64
+    assert safe_verified_payment["risk_grade"] == "안전"
+    assert safe_verified_payment["risk_score"] < 45

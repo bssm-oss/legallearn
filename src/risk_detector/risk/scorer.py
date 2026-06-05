@@ -111,10 +111,22 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         term in text for term in ["신탁원부 확인 완료", "수탁자 동의 완료"]
     )
     no_guarantee_risk = any(term in text for term in ["보증보험 불가", "보증보험 안", "보증보험 안됨", "보증보험 가입이 안", "보증보험 어렵"])
+    account_risk = any(
+        term in text
+        for term in ["계좌 명의", "다른 사람 계좌", "임대인 이름이 아닙", "대표 개인계좌", "개인계좌로 보내", "현금 요구"]
+    ) and not any(term in text for term in ["임대인 계좌 일치", "소유자 계좌 확인", "계좌 확인 완료"])
+    building_safe = any(term in text for term in ["건축물대장 확인 완료", "건축물대장 정상", "위반건축물 아님", "불법증축 아님", "무허가 아님"])
+    illegal_building_risk = any(term in text for term in ["불법증축", "쪼개기", "무허가", "용도위반", "건축물대장 못", "위반건축물"]) and not building_safe
+    pressure_risk = any(term in text for term in ["계약금 먼저", "오늘 계약금", "빨리 입금", "등기부는 나중", "서류는 나중"]) and not any(
+        term in text for term in ["계약금 보류", "등기부 확인 완료", "서류 원본 확인"]
+    )
     return {
         "registry_text_risk": registry_risk,
         "trust_text_risk": trust_risk,
         "no_guarantee_text_risk": no_guarantee_risk,
+        "account_text_risk": account_risk,
+        "illegal_building_text_risk": illegal_building_risk,
+        "pressure_text_risk": pressure_risk,
     }
 
 
@@ -136,7 +148,12 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
         or contract.suspicious_special_clause
         or has_text_risk
     )
-    guarantee_text = "보증보험 불가" if (not contract.guarantee_insurance_available or text_flags["no_guarantee_text_risk"]) else "보증보험 가능"
+    if not contract.guarantee_insurance_available or text_flags["no_guarantee_text_risk"]:
+        guarantee_text = "보증보험 불가"
+    elif has_text_risk:
+        guarantee_text = ""
+    else:
+        guarantee_text = "보증보험 가능"
     text = " ".join(
         [
             contract.contract_type,
@@ -146,8 +163,10 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             contract.user_situation_text,
             "신탁" if contract.trust_registered or text_flags["trust_text_risk"] else "",
             "압류 가압류" if contract.seizure or contract.provisional_seizure or text_flags["registry_text_risk"] else "",
-            "위반건축물" if contract.illegal_building else "",
+            "위반건축물" if contract.illegal_building or text_flags["illegal_building_text_risk"] else "",
             guarantee_text,
+            "명의 불일치 계약금 계좌" if text_flags["account_text_risk"] else "",
+            "계약 먼저 등기부는 나중" if text_flags["pressure_text_risk"] else "",
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -274,6 +293,12 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(22, "자유 입력 문장에 신탁원부 또는 수탁자 동의 미확인 정황이 있습니다.", "danger", True)
     if text_flags["no_guarantee_text_risk"] and contract.contract_type != "sale":
         add(16, "자유 입력 문장에 보증보험 가입 불가 또는 거절 정황이 있습니다.", "danger", True)
+    if text_flags["account_text_risk"]:
+        add(23, "계약금 또는 보증금 입금 계좌가 임대인/소유자 명의와 다를 가능성이 있습니다.", "danger", True)
+    if text_flags["illegal_building_text_risk"]:
+        add(18, "자유 입력 문장에 불법증축, 쪼개기, 무허가 등 건축물대장 확인 위험이 있습니다.", "danger", True)
+    if text_flags["pressure_text_risk"]:
+        add(14, "등기부·서류 확인 전 계약금 선입금 또는 급박한 계약 압박 정황이 있습니다.", "warning", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -339,6 +364,14 @@ class RiskScorer:
         if text_flags["trust_text_risk"]:
             final_score = max(final_score, 72.0)
         if text_flags["no_guarantee_text_risk"] and contract.contract_type != "sale":
+            final_score = max(final_score, 64.0)
+            if float(model_row["jeonse_ratio"]) >= 0.80 or abs(contract.nearby_market_gap_percent) >= 15:
+                final_score = max(final_score, 70.0)
+        if text_flags["account_text_risk"]:
+            final_score = max(final_score, 74.0)
+        if text_flags["illegal_building_text_risk"]:
+            final_score = max(final_score, 70.0)
+        if text_flags["pressure_text_risk"]:
             final_score = max(final_score, 64.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
