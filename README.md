@@ -108,15 +108,15 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 
 최근 학습 결과:
 
-- 전체 데이터: `109,488`행
-- 학습/검증/홀드아웃: `71,456 / 16,031 / 22,001`
-- Validation Macro F1: `0.9861`
-- Holdout Accuracy: `0.9826`
-- Holdout Balanced Accuracy: `0.9822`
-- Holdout Macro F1: `0.9820`
-- Holdout Weighted F1: `0.9827`
-- Bagging estimators: `460`
-- 추가학습: 전세가율·법적 신호 반례 `16,000`건 + 신원/대항력/체납/이중계약 현장패턴 `18,000`건 + 사용자 자연어 입력 변형 `9,000`건 추가
+- 전체 데이터: `117,488`행
+- 학습/검증/홀드아웃: `77,163 / 17,102 / 23,223`
+- Validation Macro F1: `0.9827`
+- Holdout Accuracy: `0.9784`
+- Holdout Balanced Accuracy: `0.9773`
+- Holdout Macro F1: `0.9774`
+- Holdout Weighted F1: `0.9784`
+- Bagging estimators: `520`
+- 추가학습: 전세가율·법적 신호 반례 `16,000`건 + 신원/대항력/체납/이중계약 현장패턴 `18,000`건 + 사용자 자연어 입력 변형 `9,000`건 + 구어체 텍스트-only 입력 `8,000`건 추가
 - 분리 방식: `source_case_number` 기준 그룹 분리
 
 학습 과정 설명 노트북:
@@ -142,8 +142,8 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 - 로컬 주소: `http://127.0.0.1:8765`
 - API health: `GET /api/health` 200, `model_exists=true`
 - 정적 이미지: `GET /static/risk-illustration.svg` 200, `image/svg+xml`
-- API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 15.5점`, 고위험 기본 예시 `위험 88.1점`
-- 자동 테스트: `8 passed in 5.22s`
+- API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 15.5점`, 고위험 기본 예시 `위험 84.6점`, 압류 구어체 예시 `위험 72.0점`
+- 자동 테스트: `9 passed in 6.47s`
 - Playwright 로드: 페이지 제목 `부동산 계약 위험 탐지`, 주요 입력 폼과 `위험도 분석` 버튼 렌더링 확인
 - 데스크톱/모바일 캡처:
   - `학습과정/web_demo_desktop_final.png`
@@ -166,6 +166,7 @@ flowchart LR
   I["추가 반례 예시"] --> D
   J["신원/대항력/체납/이중계약 현장패턴"] --> D
   K["사용자 자연어 입력 변형"] --> D
+  L["구어체 텍스트-only 입력"] --> D
   D --> E["전처리: 수치, 범주, 불리언, 텍스트"]
   E --> F["BaggingClassifier 학습"]
   F --> G["Validation / Holdout 평가"]
@@ -181,7 +182,7 @@ flowchart LR
 - 건축물 위험: 위반건축물 여부
 - 임대인/중개사 위험: 임대인 사고 이력, 다주택 반환 부담, 무등록 중개, 허위·과장 광고, 확인설명 부족
 - 보호 요건: 전입신고, 확정일자, 보증보험 가능 여부
-- 텍스트: 계약서 특약, 사용자 상황, 판례 기반 위험 키워드, 보호요건 완료 안전 신호, 명의 불일치, 대리권 서류 미확인, 전입신고 지연, 당일 근저당, 체납, 이중계약 치명 신호
+- 텍스트: 계약서 특약, 사용자 상황, 판례 기반 위험 키워드, 보호요건 완료 안전 신호, 구어체 안전 확인, 명의 불일치, 대리권 서류 미확인, 전입신고 지연, 당일 근저당, 신탁원부 미확인, 보증보험 불가, 압류 축소 설명, 체납, 이중계약 치명 신호
 
 ## 오프라인 공개자료 기준
 

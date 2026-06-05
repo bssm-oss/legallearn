@@ -1,19 +1,19 @@
 {
-  "trained_at": "2026-06-05T04:37:40.413124+00:00",
+  "trained_at": "2026-06-05T04:54:55.123554+00:00",
   "algorithm": "sklearn.ensemble.BaggingClassifier",
   "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-  "training_profile": "natural_language_augmented_offline_demo",
-  "additional_training_strategy": "Added counterfactual, emerging field-pattern, and natural-language user phrase examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, and double-contract patterns; increased Bagging ensemble capacity while keeping grouped validation.",
+  "training_profile": "colloquial_text_robust_offline_demo",
+  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, and colloquial text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, and informal user minimization patterns; increased Bagging ensemble capacity while keeping grouped validation.",
   "random_state": 42,
-  "n_estimators": 460,
+  "n_estimators": 520,
   "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
   "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
   "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
-  "rows": 109488,
+  "rows": 117488,
   "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
-  "train_rows": 71456,
-  "validation_rows": 16031,
-  "holdout_rows": 22001,
+  "train_rows": 77163,
+  "validation_rows": 17102,
+  "holdout_rows": 23223,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
@@ -22,21 +22,24 @@
     "synthetic_counterfactual_danger": 6400,
     "synthetic_counterfactual_caution": 4800,
     "synthetic_counterfactual_safe": 4800,
-    "synthetic_emerging_safe": 4500,
     "synthetic_user_phrase_danger": 4500,
     "synthetic_emerging_caution": 4500,
+    "synthetic_emerging_safe": 4500,
+    "synthetic_colloquial_danger": 4305,
     "synthetic_hard_caution": 3334,
     "synthetic_hard_danger": 3334,
     "synthetic_hard_safe": 3332,
     "public_indicator_safe": 2400,
     "public_indicator_caution": 2400,
+    "synthetic_user_phrase_safe": 2250,
     "synthetic_user_phrase_caution": 2250,
-    "synthetic_user_phrase_safe": 2250
+    "synthetic_colloquial_safe": 1848,
+    "synthetic_colloquial_caution": 1847
   },
   "label_counts": {
-    "안전": 35758,
-    "주의": 33468,
-    "위험": 40262
+    "안전": 37606,
+    "주의": 35315,
+    "위험": 44567
   },
   "features": [
     "deposit_million",
@@ -132,56 +135,56 @@
     "2": "위험"
   },
   "validation_metrics": {
-    "accuracy": 0.9861,
-    "balanced_accuracy": 0.986,
-    "macro_f1": 0.9861,
-    "weighted_f1": 0.9861,
-    "macro_precision": 0.9863,
-    "macro_recall": 0.986,
-    "rows": 16031,
+    "accuracy": 0.9828,
+    "balanced_accuracy": 0.9819,
+    "macro_f1": 0.9827,
+    "weighted_f1": 0.9828,
+    "macro_precision": 0.9837,
+    "macro_recall": 0.9819,
+    "rows": 17102,
     "confusion_matrix": [
       [
-        5138,
+        5332,
         84,
         0
       ],
       [
         0,
-        5192,
-        83
+        5156,
+        194
       ],
       [
         0,
-        56,
-        5478
+        16,
+        6320
       ]
     ]
   },
   "metrics": {
-    "accuracy": 0.9826,
-    "balanced_accuracy": 0.9822,
-    "macro_f1": 0.982,
-    "weighted_f1": 0.9827,
-    "macro_precision": 0.9819,
-    "macro_recall": 0.9822,
-    "rows": 22001,
+    "accuracy": 0.9784,
+    "balanced_accuracy": 0.9773,
+    "macro_f1": 0.9774,
+    "weighted_f1": 0.9784,
+    "macro_precision": 0.9776,
+    "macro_recall": 0.9773,
+    "rows": 23223,
     "confusion_matrix": [
       [
-        7025,
-        140,
+        7373,
+        196,
         0
       ],
       [
-        84,
-        6484,
-        66
+        56,
+        6524,
+        161
       ],
       [
         0,
-        92,
-        8110
+        89,
+        8824
       ]
     ],
-    "test_rows": 22001
+    "test_rows": 23223
   }
 }

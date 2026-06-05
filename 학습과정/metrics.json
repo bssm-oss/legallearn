@@ -1,55 +1,55 @@
 {
   "validation": {
-    "accuracy": 0.9861,
-    "balanced_accuracy": 0.986,
-    "macro_f1": 0.9861,
-    "weighted_f1": 0.9861,
-    "macro_precision": 0.9863,
-    "macro_recall": 0.986,
-    "rows": 16031,
+    "accuracy": 0.9828,
+    "balanced_accuracy": 0.9819,
+    "macro_f1": 0.9827,
+    "weighted_f1": 0.9828,
+    "macro_precision": 0.9837,
+    "macro_recall": 0.9819,
+    "rows": 17102,
     "confusion_matrix": [
       [
-        5138,
+        5332,
         84,
         0
       ],
       [
         0,
-        5192,
-        83
+        5156,
+        194
       ],
       [
         0,
-        56,
-        5478
+        16,
+        6320
       ]
     ]
   },
   "holdout": {
-    "accuracy": 0.9826,
-    "balanced_accuracy": 0.9822,
-    "macro_f1": 0.982,
-    "weighted_f1": 0.9827,
-    "macro_precision": 0.9819,
-    "macro_recall": 0.9822,
-    "rows": 22001,
+    "accuracy": 0.9784,
+    "balanced_accuracy": 0.9773,
+    "macro_f1": 0.9774,
+    "weighted_f1": 0.9784,
+    "macro_precision": 0.9776,
+    "macro_recall": 0.9773,
+    "rows": 23223,
     "confusion_matrix": [
       [
-        7025,
-        140,
+        7373,
+        196,
         0
       ],
       [
-        84,
-        6484,
-        66
+        56,
+        6524,
+        161
       ],
       [
         0,
-        92,
-        8110
+        89,
+        8824
       ]
     ],
-    "test_rows": 22001
+    "test_rows": 23223
   }
 }
