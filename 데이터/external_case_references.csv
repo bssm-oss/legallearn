@@ -1,0 +1,4 @@
+﻿reference_id,source_name,source_url,case_number,risk_theme,risk_label_hint,evidence_summary
+EXT_CASE_001,국가법령정보센터 판례,https://www.law.go.kr/LSW/precInfoP.do?precSeq=97060,82도2428,전세보증금 채권 양도와 사기죄 성립 경계,1,전세보증금 관련 채권 이전·처분 구조를 경계 사례로 참조한다.
+EXT_CASE_002,한국경제 대법원 보도,https://www.hankyung.com/article/202506220823i,대법원 2025.5.29. 선고 보증채무금 관련 사건,전세보증금 부풀림과 허위 전세계약,2,계약서상 보증금과 실제 지급 보증금 차이를 허위 계약 위험으로 반영한다.
+EXT_CASE_003,한국경제 부동산 법률 칼럼 판결 소개,https://www.hankyung.com/article/202305015715Q,1심 대출사기 의심 사건,"매매가보다 높은 전세금, 감정평가·대출사기 의심",2,매매가보다 전세금이 높은 구조를 고위험 학습 예시로 참조한다.

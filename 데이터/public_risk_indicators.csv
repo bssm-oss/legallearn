@@ -1,0 +1,11 @@
+﻿indicator_id,source_type,source_name,source_url,risk_theme,risk_label,recommended_feature,evidence_summary
+PUB_SAFE_RT_LOW_RATIO,official_market,국토교통부 실거래가 공개시스템,https://rt.molit.go.kr/pt/info/info.do?mobileAt=v,실거래가 기준 저전세가율 정상 계약,0,"jeonse_ratio, nearby_market_gap_percent",부동산 거래신고 자료를 주변 시세 검증 기준으로 사용한다.
+PUB_CAUTION_RT_GAP,official_market,국토교통부 아파트 매매 실거래가 자료,https://www.data.go.kr/data/15126469/openapi.do,주변 실거래가 대비 보증금 또는 매매가 괴리,1,nearby_market_gap_percent,실거래 신고자료와 입력 가격의 괴리를 주의 신호로 사용한다.
+PUB_DANGER_HUG_LTV90,official_guarantee,HUG 전세보증금반환보증 상품개요,https://m.khug.or.kr/hug/web/ig/dr/igdr000001.jsp?tabMenu=Y,보증금과 선순위채권 합산액이 주택가격 90% 기준을 초과,2,"debt_ratio, guarantee_insurance_available",보증보험 가능 여부와 선순위채권 합산 비율을 핵심 위험 신호로 사용한다.
+PUB_DANGER_HUG_INCIDENT,official_guarantee,HUG 전세 및 임대보증 공공데이터,https://khug.or.kr/houstar/web/p03/01/p030105.jsp?articleId=34712&currentPage=1&mode=S,전세보증 사고·대위변제 이력 기반 지역/임대인 위험,2,"landlord_prior_incidents, landlord_multiple_properties",보증사고 공개자료는 향후 임대인/지역 위험 보강 후보로 사용한다.
+PUB_DANGER_REGISTRY_SEIZURE,official_registry,대법원 인터넷등기소,https://www.iros.go.kr,등기부 갑구 압류·가압류·가처분 권리침해,2,"seizure, provisional_seizure",등기부 권리침해 표시는 계약 전 중대한 위험 신호다.
+PUB_DANGER_TRUST,official_registry,대법원 인터넷등기소,https://www.iros.go.kr,신탁등기와 임대 권한 확인 누락,2,"trust_registered, broker_explained_rights",신탁원부와 임대 권한 확인이 누락되면 보증금 회수 위험이 커진다.
+PUB_DANGER_BUILDING,official_building,국토교통부 건축HUB 건축물대장정보 서비스,https://www.data.go.kr/data/15134735/openapi.do,건축물대장상 위반건축물,2,illegal_building,건축물대장 속성은 위반건축물 여부 확인 후보 데이터다.
+PUB_CAUTION_BROKER_AD,official_law,"공인중개사법 제18조의2, 제33조",https://www.law.go.kr/법령/공인중개사법,허위·과장 광고 또는 무등록 중개 의심,1,"broker_unregistered, broker_advertising_issue",중개대상물 부당 표시·광고와 금지행위를 중개 위험 신호로 사용한다.
+PUB_SAFE_PROTECTION,official_law,주택임대차보호법,https://www.law.go.kr/법령/주택임대차보호법,전입·확정일자·보증보험 가능 정상 보호 조건,0,"fixed_date_ready, move_in_ready, guarantee_insurance_available",보호 요건이 모두 가능한 경우 정상 계약 기준 사례로 사용한다.
+PUB_DANGER_FALSE_CONTRACT,case_news,대법원 전세보증금 부풀린 계약서 보도,https://www.hankyung.com/article/202506220823i,보증금 부풀림·허위 계약서 기반 대출/보증 위험,2,"nearby_market_gap_percent, suspicious_special_clause",실제 지급액과 계약서 보증금이 크게 다르면 허위 계약 위험으로 반영한다.
