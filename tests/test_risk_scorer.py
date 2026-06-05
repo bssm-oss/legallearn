@@ -285,3 +285,89 @@ def test_payment_account_and_building_text_only_inputs_are_not_missed():
     assert pressure_deposit["risk_score"] >= 64
     assert safe_verified_payment["risk_grade"] == "안전"
     assert safe_verified_payment["risk_score"] < 45
+
+
+def test_tenancy_title_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    unauthorized_sublease = scorer.score(
+        {
+            "contract_type": "monthly_rent",
+            "property_type": "officetel",
+            "region": "수도권",
+            "deposit_million": 50,
+            "monthly_rent_million": 0.8,
+            "estimated_market_price_million": 240,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "집주인이 아니라 기존 세입자가 전대차로 계약하자고 합니다. 임대인 동의서는 없고 전입신고는 가능하다고만 해요.",
+        }
+    )
+    lease_registration = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 250,
+            "estimated_market_price_million": 520,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "등기부에 임차권등기명령이 남아 있는데 전 세입자와는 해결됐다고만 합니다.",
+        }
+    )
+    unregistered_new_build = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 230,
+            "estimated_market_price_million": 330,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "신축인데 아직 미등기이고 사용승인 전이라 등기부등본이 없다고 합니다.",
+        }
+    )
+    non_refundable_reservation = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 210,
+            "estimated_market_price_million": 330,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "가계약금 넣으면 환불불가라고 하고 계약서 보기 전 먼저 송금하라고 합니다.",
+        }
+    )
+    safe_sublease_like = scorer.score(
+        {
+            "contract_type": "monthly_rent",
+            "property_type": "officetel",
+            "region": "수도권",
+            "deposit_million": 50,
+            "monthly_rent_million": 0.8,
+            "estimated_market_price_million": 240,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "전대차가 아니라 임대인 본인과 직접 계약하고 임대인 동의서 확인 완료했습니다.",
+        }
+    )
+    assert unauthorized_sublease["risk_grade"] == "위험"
+    assert unauthorized_sublease["risk_score"] >= 70
+    assert lease_registration["risk_grade"] == "위험"
+    assert lease_registration["risk_score"] >= 72
+    assert unregistered_new_build["risk_grade"] == "위험"
+    assert unregistered_new_build["risk_score"] >= 74
+    assert non_refundable_reservation["risk_grade"] in {"주의", "위험"}
+    assert non_refundable_reservation["risk_score"] >= 64
+    assert safe_sublease_like["risk_grade"] == "안전"
+    assert safe_sublease_like["risk_score"] < 45

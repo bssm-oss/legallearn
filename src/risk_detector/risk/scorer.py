@@ -120,6 +120,14 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
     pressure_risk = any(term in text for term in ["계약금 먼저", "오늘 계약금", "빨리 입금", "등기부는 나중", "서류는 나중"]) and not any(
         term in text for term in ["계약금 보류", "등기부 확인 완료", "서류 원본 확인"]
     )
+    sublease_safe = any(term in text for term in ["전대차가 아니라", "임대인 본인과 직접 계약", "임대인 동의서 확인 완료"])
+    sublease_risk = any(term in text for term in ["전대차", "기존 세입자", "임대인 동의서 없음", "임대인 동의서는 없"]) and not sublease_safe
+    lease_registration_risk = "임차권등기명령" in text and not any(term in text for term in ["임차권등기명령 말소 완료", "말소 완료", "말소등기 완료"])
+    unregistered_safe = any(term in text for term in ["소유권보존등기 완료", "사용승인 완료", "등기부 확인 완료"])
+    unregistered_risk = any(term in text for term in ["미등기", "사용승인 전", "등기부등본이 없"]) and not unregistered_safe
+    reservation_deposit_risk = "가계약금" in text and any(term in text for term in ["환불불가", "계약서 보기 전", "먼저 송금"]) and not any(
+        term in text for term in ["가계약금 환불 가능", "계약서 확인 완료", "환불 가능"]
+    )
     return {
         "registry_text_risk": registry_risk,
         "trust_text_risk": trust_risk,
@@ -127,6 +135,10 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "account_text_risk": account_risk,
         "illegal_building_text_risk": illegal_building_risk,
         "pressure_text_risk": pressure_risk,
+        "sublease_text_risk": sublease_risk,
+        "lease_registration_text_risk": lease_registration_risk,
+        "unregistered_text_risk": unregistered_risk,
+        "reservation_deposit_text_risk": reservation_deposit_risk,
     }
 
 
@@ -167,6 +179,10 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             guarantee_text,
             "명의 불일치 계약금 계좌" if text_flags["account_text_risk"] else "",
             "계약 먼저 등기부는 나중" if text_flags["pressure_text_risk"] else "",
+            "전대차 임대인 동의서 없음" if text_flags["sublease_text_risk"] else "",
+            "임차권등기명령 말소 미확인" if text_flags["lease_registration_text_risk"] else "",
+            "미등기 사용승인 전" if text_flags["unregistered_text_risk"] else "",
+            "가계약금 환불불가 계약서 보기 전" if text_flags["reservation_deposit_text_risk"] else "",
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -299,6 +315,14 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(18, "자유 입력 문장에 불법증축, 쪼개기, 무허가 등 건축물대장 확인 위험이 있습니다.", "danger", True)
     if text_flags["pressure_text_risk"]:
         add(14, "등기부·서류 확인 전 계약금 선입금 또는 급박한 계약 압박 정황이 있습니다.", "warning", True)
+    if text_flags["sublease_text_risk"]:
+        add(20, "임대인 동의 없는 전대차 또는 기존 세입자와의 계약 정황이 있습니다.", "danger", True)
+    if text_flags["lease_registration_text_risk"]:
+        add(20, "등기부에 임차권등기명령 말소 미확인 정황이 있습니다.", "danger", True)
+    if text_flags["unregistered_text_risk"]:
+        add(22, "미등기 또는 사용승인 전 신축으로 권리관계 확인이 어렵습니다.", "danger", True)
+    if text_flags["reservation_deposit_text_risk"]:
+        add(16, "계약서 확인 전 가계약금 환불불가 또는 선송금 압박이 있습니다.", "warning", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -372,6 +396,14 @@ class RiskScorer:
         if text_flags["illegal_building_text_risk"]:
             final_score = max(final_score, 70.0)
         if text_flags["pressure_text_risk"]:
+            final_score = max(final_score, 64.0)
+        if text_flags["sublease_text_risk"]:
+            final_score = max(final_score, 70.0)
+        if text_flags["lease_registration_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["unregistered_text_risk"]:
+            final_score = max(final_score, 74.0)
+        if text_flags["reservation_deposit_text_risk"]:
             final_score = max(final_score, 64.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
