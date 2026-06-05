@@ -37,6 +37,8 @@ NUMERIC_FEATURES = [
     "broker_term_count",
     "lease_term_count",
     "sale_term_count",
+    "safety_term_count",
+    "critical_term_count",
 ]
 
 CATEGORICAL_FEATURES = [
@@ -63,6 +65,8 @@ BOOLEAN_FEATURES = [
     "has_crime_signal",
     "has_broker_signal",
     "has_registry_signal",
+    "has_safety_signal",
+    "has_critical_signal",
 ]
 
 TEXT_FEATURE = "combined_text"
@@ -226,6 +230,25 @@ def load_case_rows(path: Path = SOURCE_CASES_CSV) -> list[dict[str, str]]:
 
 def _clip(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
+
+
+def _refresh_text_signal_columns(df: pd.DataFrame) -> pd.DataFrame:
+    # 모든 생성 경로가 같은 텍스트 신호 스키마를 갖도록 최종 DataFrame 단계에서 한 번 더 정규화한다.
+    refreshed = df.copy()
+    signals = refreshed["combined_text"].fillna("").astype(str).map(extract_text_signals)
+    refreshed["danger_term_count"] = signals.map(lambda item: item.danger_term_count)
+    refreshed["registry_term_count"] = signals.map(lambda item: item.registry_term_count)
+    refreshed["broker_term_count"] = signals.map(lambda item: item.broker_term_count)
+    refreshed["lease_term_count"] = signals.map(lambda item: item.lease_term_count)
+    refreshed["sale_term_count"] = signals.map(lambda item: item.sale_term_count)
+    refreshed["safety_term_count"] = signals.map(lambda item: item.safety_term_count)
+    refreshed["critical_term_count"] = signals.map(lambda item: item.critical_term_count)
+    refreshed["has_crime_signal"] = signals.map(lambda item: item.has_crime_signal)
+    refreshed["has_broker_signal"] = signals.map(lambda item: item.has_broker_signal)
+    refreshed["has_registry_signal"] = signals.map(lambda item: item.has_registry_signal)
+    refreshed["has_safety_signal"] = signals.map(lambda item: item.has_safety_signal)
+    refreshed["has_critical_signal"] = signals.map(lambda item: item.has_critical_signal)
+    return refreshed
 
 
 def risk_label_from_score(score: float) -> int:
@@ -1469,6 +1492,309 @@ def _emerging_pattern_examples(count: int, rng: random.Random) -> list[dict[str,
     return rows
 
 
+def _user_phrase_variation_examples(count: int, rng: random.Random) -> list[dict[str, object]]:
+    # 실제 사용자가 짧게 쓰는 자연어 문장을 모델이 직접 구분하도록 안전/주의/위험 문장형 변형을 추가한다.
+    rows: list[dict[str, object]] = []
+    templates = [
+        {
+            "label": 0,
+            "source": "synthetic_user_phrase_safe",
+            "text": "등기부 갑구 을구 권리침해 없음 보증보험 가능 확정일자 진행 전입신고 가능 낮은 전세가율 정상 계약",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.36, 0.58),
+            "mortgage_range": (0.00, 0.06),
+            "senior_range": (0.00, 0.03),
+            "gap_range": (-8, 2),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_user_phrase_safe",
+            "text": "대리계약이지만 위임장 원본 인감증명 원본 소유자 영상통화 확인 완료 권리침해 없음 보증보험 가능",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.38, 0.60),
+            "mortgage_range": (0.00, 0.08),
+            "senior_range": (0.00, 0.03),
+            "gap_range": (-7, 4),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_user_phrase_safe",
+            "text": "다가구 전체 선순위보증금 명세 확인 완료 보증금 소액 낮은 부채비율 확정일자 전입 가능",
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.06, 0.20),
+            "mortgage_range": (0.00, 0.10),
+            "senior_range": (0.02, 0.10),
+            "gap_range": (-5, 5),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_user_phrase_caution",
+            "text": "전세가율만 높은 편 권리침해 없음 보증보험 가능하지만 주변 시세 재확인 필요",
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.78, 0.88),
+            "mortgage_range": (0.00, 0.10),
+            "senior_range": (0.00, 0.05),
+            "gap_range": (4, 14),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_user_phrase_caution",
+            "text": "신축 빌라 실거래가 부족 감정가 차이 큼 보증보험 심사 전이라 계약 보류 필요",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.66, 0.84),
+            "mortgage_range": (0.00, 0.16),
+            "senior_range": (0.00, 0.08),
+            "gap_range": (10, 24),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_user_phrase_caution",
+            "text": "대리계약 서류 확인 예정 위임장 원본 아직 미도착 계약 전 원본 확인 필요",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.42, 0.64),
+            "mortgage_range": (0.00, 0.10),
+            "senior_range": (0.00, 0.05),
+            "gap_range": (-4, 8),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_user_phrase_danger",
+            "text": "신탁등기 있는데 신탁원부 수탁자 동의서 계약 후 제공 보증보험 불가 임대 권한 불명",
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.46, 0.70),
+            "mortgage_range": (0.00, 0.08),
+            "senior_range": (0.00, 0.06),
+            "gap_range": (-4, 10),
+            "flags": {
+                "trust_registered": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+                "suspicious_special_clause": True,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_user_phrase_danger",
+            "text": "보증금은 낮아도 압류 가압류 갑구 권리침해 보증보험 불가 말소 조건 없음",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.38, 0.62),
+            "mortgage_range": (0.00, 0.12),
+            "senior_range": (0.00, 0.05),
+            "gap_range": (-6, 6),
+            "flags": {
+                "seizure": True,
+                "provisional_seizure": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_user_phrase_danger",
+            "text": "등기부 소유자와 계약자 명의 불일치 신분증 불일치 위임장 인감증명 나중에 준다고 함",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "criminal_fraud",
+            "jeonse_range": (0.50, 0.78),
+            "mortgage_range": (0.00, 0.16),
+            "senior_range": (0.00, 0.08),
+            "gap_range": (0, 14),
+            "flags": {
+                "broker_advertising_issue": True,
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_user_phrase_danger",
+            "text": "전입신고 늦추라고 함 잔금 후 담보대출 당일 근저당 전입 전 근저당 대항력 공백",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_fraud_duress",
+            "jeonse_range": (0.60, 0.84),
+            "mortgage_range": (0.10, 0.34),
+            "senior_range": (0.00, 0.10),
+            "gap_range": (2, 18),
+            "flags": {
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+                "fixed_date_ready": False,
+                "move_in_ready": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_user_phrase_danger",
+            "text": "국세 체납 지방세 체납 당해세 우선변제 압류 가능 보증금보다 세금이 먼저 갈 수 있음",
+            "contract_type": "jeonse",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.38, 0.66),
+            "mortgage_range": (0.00, 0.18),
+            "senior_range": (0.03, 0.18),
+            "gap_range": (-4, 12),
+            "flags": {
+                "seizure": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_user_phrase_danger",
+            "text": "같은 호실 중복계약 이중계약 의심 다중 임차인 선순위보증금 숨김",
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "legal_category": "criminal_fraud",
+            "jeonse_range": (0.12, 0.36),
+            "mortgage_range": (0.08, 0.28),
+            "senior_range": (0.16, 0.44),
+            "gap_range": (0, 18),
+            "flags": {
+                "landlord_multiple_properties": True,
+                "landlord_prior_incidents": True,
+                "broker_advertising_issue": True,
+                "suspicious_special_clause": True,
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+    ]
+
+    for idx in range(count):
+        template = templates[idx % len(templates)]
+        label = int(template["label"])
+        market = round(rng.uniform(120, 1500), 1)
+        contract_type = str(template["contract_type"])
+        jeonse_ratio = rng.uniform(*template["jeonse_range"])
+        mortgage_ratio = rng.uniform(*template["mortgage_range"])
+        senior_ratio = rng.uniform(*template["senior_range"])
+        if contract_type == "sale":
+            sale_price = round(market * rng.uniform(0.90, 1.10), 1)
+            deposit = round(sale_price * rng.uniform(0.04, 0.14), 1)
+            monthly_rent = 0.0
+        elif contract_type == "monthly_rent":
+            sale_price = 0.0
+            deposit = round(market * jeonse_ratio, 1)
+            monthly_rent = round(rng.uniform(0.35, 3.0), 2)
+        else:
+            sale_price = 0.0
+            deposit = round(market * jeonse_ratio, 1)
+            monthly_rent = 0.0
+
+        mortgage = round(market * mortgage_ratio, 1)
+        senior = round(market * senior_ratio, 1)
+        flags = {
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": label >= 1 and rng.random() < 0.30,
+            "landlord_prior_incidents": label == 2 and rng.random() < 0.28,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": label >= 1 and rng.random() < 0.35,
+            "guarantee_insurance_available": contract_type != "sale" and label == 0,
+            "fixed_date_ready": label != 2,
+            "move_in_ready": label != 2,
+            "broker_explained_rights": label == 0,
+        }
+        flags.update(template["flags"])
+        signals = extract_text_signals(str(template["text"]))
+        score = {0: rng.uniform(6, 32), 1: rng.uniform(41, 67), 2: rng.uniform(75, 99)}[label]
+        rows.append(
+            {
+                "source": template["source"],
+                "source_case_number": f"USER_PHRASE_{idx + 1:05d}",
+                "source_case_name": "사용자 자연어 입력 변형 예시",
+                "derivation_variant_id": idx,
+                "contract_type": contract_type,
+                "property_type": template["property_type"],
+                "region": rng.choice(["수도권", "비수도권", "광역시", "지방중소도시"]),
+                "deposit_million": deposit,
+                "monthly_rent_million": monthly_rent,
+                "sale_price_million": sale_price,
+                "estimated_market_price_million": market,
+                "mortgage_million": mortgage,
+                "senior_claim_million": senior,
+                "jeonse_ratio": round(deposit / max(market, 1), 4),
+                "debt_ratio": round((deposit + mortgage + senior) / max(market, 1), 4),
+                "nearby_market_gap_percent": round(rng.uniform(*template["gap_range"]), 2),
+                "contract_period_months": rng.choice([0, 12, 24, 36]) if contract_type == "sale" else rng.choice([12, 24, 24, 36]),
+                **flags,
+                "danger_term_count": signals.danger_term_count,
+                "registry_term_count": signals.registry_term_count,
+                "broker_term_count": signals.broker_term_count,
+                "lease_term_count": signals.lease_term_count,
+                "sale_term_count": signals.sale_term_count,
+                "safety_term_count": signals.safety_term_count,
+                "critical_term_count": signals.critical_term_count,
+                "has_crime_signal": signals.has_crime_signal,
+                "has_broker_signal": signals.has_broker_signal,
+                "has_registry_signal": signals.has_registry_signal,
+                "has_safety_signal": signals.has_safety_signal,
+                "has_critical_signal": signals.has_critical_signal,
+                "legal_category": template["legal_category"],
+                "combined_text": str(template["text"]),
+                SCORE_COLUMN: round(score, 2),
+                TARGET_COLUMN: label,
+            }
+        )
+    return rows
+
+
 def build_derived_contract_dataset(
     seed: int = 42,
     safe_examples: int = 18000,
@@ -1477,8 +1803,9 @@ def build_derived_contract_dataset(
     public_indicator_examples: int = 12000,
     counterfactual_examples: int = 16000,
     emerging_examples: int = 18000,
+    user_phrase_examples: int = 9000,
 ) -> pd.DataFrame:
-    # 최종 학습 데이터 = 판례 파생 + 정상 기준 + 경계/스트레스 + 공개자료 지표 + 추가 반례/현장패턴 예시.
+    # 최종 학습 데이터 = 판례 파생 + 정상 기준 + 경계/스트레스 + 공개자료 지표 + 반례/현장패턴/사용자 문장 예시.
     rng = random.Random(seed)
     case_rows = load_case_rows()
     derived = [
@@ -1491,7 +1818,9 @@ def build_derived_contract_dataset(
     derived.extend(_public_indicator_examples(public_indicator_examples, rng))
     derived.extend(_counterfactual_stress_examples(counterfactual_examples, rng))
     derived.extend(_emerging_pattern_examples(emerging_examples, rng))
+    derived.extend(_user_phrase_variation_examples(user_phrase_examples, rng))
     df = pd.DataFrame(derived)
+    df = _refresh_text_signal_columns(df)
     df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
     return df
 
@@ -1527,7 +1856,7 @@ def write_data_quality_report(df: pd.DataFrame, path: Path = DATA_DIR / "data_qu
         "duplicate_rows": int(df.duplicated().sum()),
         "jeonse_ratio_quantiles": df["jeonse_ratio"].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.99, 1]).round(4).to_dict(),
         "debt_ratio_quantiles": df["debt_ratio"].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.99, 1]).round(4).to_dict(),
-        "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시를 결합했다. 실제 피해자 원천 기록은 아니다.",
+        "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시, 사용자 자연어 입력 변형 예시를 결합했다. 실제 피해자 원천 기록은 아니다.",
     }
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 

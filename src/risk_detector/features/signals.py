@@ -104,6 +104,53 @@ SALE_TERMS = [
     "분양",
 ]
 
+SAFETY_TERMS = [
+    "확인 완료",
+    "원본 확인",
+    "권리침해 없음",
+    "보증보험 가능",
+    "확정일자 진행",
+    "전입신고 가능",
+    "전입 가능",
+    "말소특약",
+    "계약 해제",
+    "소유자 영상통화",
+    "위임장 원본",
+    "인감증명 원본",
+    "선순위보증금 명세",
+    "전체 선순위",
+    "낮은 전세가율",
+    "낮은 부채비율",
+    "정상 계약",
+    "보호요건 충족",
+]
+
+CRITICAL_RISK_TERMS = [
+    "보증보험 불가",
+    "신탁원부",
+    "수탁자 동의",
+    "임대 권한 불명",
+    "압류",
+    "가압류",
+    "가처분",
+    "위반건축물",
+    "선순위보증금 불명",
+    "선순위보증금 숨김",
+    "명의 불일치",
+    "신분증 불일치",
+    "전입신고 지연",
+    "전입 전 근저당",
+    "당일 근저당",
+    "대항력 공백",
+    "국세 체납",
+    "지방세 체납",
+    "당해세",
+    "이중계약",
+    "중복계약",
+    "보증금 부풀림",
+    "허위계약",
+]
+
 
 @dataclass(frozen=True)
 class TextSignals:
@@ -112,9 +159,13 @@ class TextSignals:
     broker_term_count: int
     lease_term_count: int
     sale_term_count: int
+    safety_term_count: int
+    critical_term_count: int
     has_crime_signal: bool
     has_broker_signal: bool
     has_registry_signal: bool
+    has_safety_signal: bool
+    has_critical_signal: bool
 
 
 def count_terms(text: str, terms: list[str]) -> int:
@@ -128,13 +179,19 @@ def extract_text_signals(text: str) -> TextSignals:
     broker = count_terms(normalized, BROKER_TERMS)
     lease = count_terms(normalized, LEASE_TERMS)
     sale = count_terms(normalized, SALE_TERMS)
+    safety = count_terms(normalized, SAFETY_TERMS)
+    critical = count_terms(normalized, CRITICAL_RISK_TERMS)
     return TextSignals(
         danger_term_count=danger,
         registry_term_count=registry,
         broker_term_count=broker,
         lease_term_count=lease,
         sale_term_count=sale,
+        safety_term_count=safety,
+        critical_term_count=critical,
         has_crime_signal=danger > 0,
         has_broker_signal=broker > 0,
         has_registry_signal=registry > 0,
+        has_safety_signal=safety > 0,
+        has_critical_signal=critical > 0,
     )

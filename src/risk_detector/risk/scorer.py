@@ -145,9 +145,13 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
         "broker_term_count": signals.broker_term_count,
         "lease_term_count": signals.lease_term_count,
         "sale_term_count": signals.sale_term_count,
+        "safety_term_count": signals.safety_term_count,
+        "critical_term_count": signals.critical_term_count,
         "has_crime_signal": signals.has_crime_signal,
         "has_broker_signal": signals.has_broker_signal,
         "has_registry_signal": signals.has_registry_signal,
+        "has_safety_signal": signals.has_safety_signal,
+        "has_critical_signal": signals.has_critical_signal,
         "legal_category": infer_legal_category(contract),
         TEXT_FEATURE: text,
     }
