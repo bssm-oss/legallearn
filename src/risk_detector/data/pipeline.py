@@ -1795,6 +1795,313 @@ def _user_phrase_variation_examples(count: int, rng: random.Random) -> list[dict
     return rows
 
 
+def _colloquial_text_only_examples(count: int, rng: random.Random) -> list[dict[str, object]]:
+    # 사용자가 체크박스를 빠뜨리고 상황란에만 구어체로 쓰는 경우를 학습시키는 텍스트 중심 예시다.
+    rows: list[dict[str, object]] = []
+    templates = [
+        {
+            "label": 0,
+            "source": "synthetic_colloquial_safe",
+            "text": "등기부 깨끗 갑구 을구 깨끗 보증보험 가능 전입 바로 가능 확정일자 바로 가능",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.35, 0.58),
+            "mortgage_range": (0.00, 0.04),
+            "senior_range": (0.00, 0.02),
+            "gap_range": (-8, 2),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_colloquial_safe",
+            "text": "집주인 본인 확인 신분증 일치 서류 원본 확인 낮은 전세가율 보증보험 가능",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.38, 0.62),
+            "mortgage_range": (0.00, 0.06),
+            "senior_range": (0.00, 0.03),
+            "gap_range": (-6, 4),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 0,
+            "source": "synthetic_colloquial_safe",
+            "text": "월세 보증금 낮고 선순위 명세 확인 완료 등기부 깨끗 전입 바로 가능",
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.05, 0.20),
+            "mortgage_range": (0.00, 0.08),
+            "senior_range": (0.02, 0.10),
+            "gap_range": (-5, 5),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_colloquial_caution",
+            "text": "중개사가 괜찮다는데 전세가율이 좀 높고 실거래가가 적어서 보류하고 싶음",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.72, 0.86),
+            "mortgage_range": (0.00, 0.10),
+            "senior_range": (0.00, 0.04),
+            "gap_range": (8, 20),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_colloquial_caution",
+            "text": "근저당 일부 있는데 잔금 때 말소한다더라 말소특약 문구를 더 정확히 넣어야 함",
+            "contract_type": "sale",
+            "property_type": "apartment",
+            "legal_category": "civil_sale_effect",
+            "jeonse_range": (0.04, 0.12),
+            "mortgage_range": (0.10, 0.24),
+            "senior_range": (0.00, 0.03),
+            "gap_range": (-3, 6),
+            "flags": {
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 1,
+            "source": "synthetic_colloquial_caution",
+            "text": "보증보험 심사 전이라 확답 없음 등기부는 깨끗하지만 계약 전 재확인 필요",
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.64, 0.78),
+            "mortgage_range": (0.00, 0.10),
+            "senior_range": (0.00, 0.05),
+            "gap_range": (0, 12),
+            "flags": {
+                "guarantee_insurance_available": True,
+                "fixed_date_ready": True,
+                "move_in_ready": True,
+                "broker_explained_rights": True,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "등기부에 압류 있는데 집주인이 곧 풀린다더라 문제없다며 계약 먼저 하자고 함",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.34, 0.62),
+            "mortgage_range": (0.00, 0.08),
+            "senior_range": (0.00, 0.04),
+            "gap_range": (-5, 8),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "신탁 표시 있는데 신탁원부 없어도 된대 수탁자 동의 나중에 받자고 함",
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.38, 0.68),
+            "mortgage_range": (0.00, 0.08),
+            "senior_range": (0.00, 0.05),
+            "gap_range": (-3, 12),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+                "suspicious_special_clause": True,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "보증보험 안 된다는데 이유를 안 알려줌 시세보다 보증금이 높은 편이라 불안함",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.82, 0.98),
+            "mortgage_range": (0.02, 0.18),
+            "senior_range": (0.00, 0.10),
+            "gap_range": (10, 28),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "전입신고 며칠 늦춰달라 하고 잔금 후 대출 예정이라 대항력 공백 생길 수 있음",
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "legal_category": "civil_fraud_duress",
+            "jeonse_range": (0.55, 0.82),
+            "mortgage_range": (0.08, 0.28),
+            "senior_range": (0.00, 0.08),
+            "gap_range": (0, 16),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "fixed_date_ready": False,
+                "move_in_ready": False,
+                "broker_explained_rights": False,
+                "suspicious_special_clause": True,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "집주인 이름 다름 계약자는 가족이라는데 신분증 원본도 못 봤고 위임장도 없음",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "criminal_fraud",
+            "jeonse_range": (0.42, 0.74),
+            "mortgage_range": (0.00, 0.12),
+            "senior_range": (0.00, 0.08),
+            "gap_range": (-2, 14),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+                "broker_advertising_issue": True,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "국세 체납 조금 있다는데 당해세는 괜찮다더라 세금 완납증명은 계약 후 준다고 함",
+            "contract_type": "jeonse",
+            "property_type": "multi_family",
+            "legal_category": "civil_lease_definition",
+            "jeonse_range": (0.34, 0.66),
+            "mortgage_range": (0.00, 0.16),
+            "senior_range": (0.04, 0.20),
+            "gap_range": (-3, 12),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+            },
+        },
+        {
+            "label": 2,
+            "source": "synthetic_colloquial_danger",
+            "text": "무융자 광고 보고 갔는데 등기부랑 광고 다름 근저당이 있고 중개사가 대충 넘어감",
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "legal_category": "realtor_prohibited_acts",
+            "jeonse_range": (0.64, 0.88),
+            "mortgage_range": (0.12, 0.34),
+            "senior_range": (0.00, 0.08),
+            "gap_range": (4, 18),
+            "flags": {
+                "guarantee_insurance_available": False,
+                "broker_explained_rights": False,
+                "broker_advertising_issue": True,
+            },
+        },
+    ]
+
+    for idx in range(count):
+        template = templates[idx % len(templates)]
+        label = int(template["label"])
+        market = round(rng.uniform(100, 1600), 1)
+        contract_type = str(template["contract_type"])
+        ratio = rng.uniform(*template["jeonse_range"])
+        if contract_type == "sale":
+            sale_price = round(market * rng.uniform(0.90, 1.10), 1)
+            deposit = round(sale_price * ratio, 1)
+            monthly_rent = 0.0
+        elif contract_type == "monthly_rent":
+            sale_price = 0.0
+            deposit = round(market * ratio, 1)
+            monthly_rent = round(rng.uniform(0.35, 2.5), 2)
+        else:
+            sale_price = 0.0
+            deposit = round(market * ratio, 1)
+            monthly_rent = 0.0
+        mortgage = round(market * rng.uniform(*template["mortgage_range"]), 1)
+        senior = round(market * rng.uniform(*template["senior_range"]), 1)
+        flags = {
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": label >= 1 and rng.random() < 0.24,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": label >= 1 and rng.random() < 0.28,
+            "guarantee_insurance_available": contract_type != "sale" and label == 0,
+            "fixed_date_ready": label != 2,
+            "move_in_ready": label != 2,
+            "broker_explained_rights": label == 0,
+        }
+        flags.update(template["flags"])
+        signals = extract_text_signals(str(template["text"]))
+        score = {0: rng.uniform(6, 30), 1: rng.uniform(42, 67), 2: rng.uniform(74, 99)}[label]
+        rows.append(
+            {
+                "source": template["source"],
+                "source_case_number": f"COLLOQUIAL_{idx + 1:05d}",
+                "source_case_name": "사용자 구어체 텍스트-only 입력 예시",
+                "derivation_variant_id": idx,
+                "contract_type": contract_type,
+                "property_type": template["property_type"],
+                "region": rng.choice(["수도권", "비수도권", "광역시", "지방중소도시"]),
+                "deposit_million": deposit,
+                "monthly_rent_million": monthly_rent,
+                "sale_price_million": sale_price,
+                "estimated_market_price_million": market,
+                "mortgage_million": mortgage,
+                "senior_claim_million": senior,
+                "jeonse_ratio": round(deposit / max(market, 1), 4),
+                "debt_ratio": round((deposit + mortgage + senior) / max(market, 1), 4),
+                "nearby_market_gap_percent": round(rng.uniform(*template["gap_range"]), 2),
+                "contract_period_months": rng.choice([0, 12, 24, 36]) if contract_type == "sale" else rng.choice([12, 24, 24, 36]),
+                **flags,
+                "danger_term_count": signals.danger_term_count,
+                "registry_term_count": signals.registry_term_count,
+                "broker_term_count": signals.broker_term_count,
+                "lease_term_count": signals.lease_term_count,
+                "sale_term_count": signals.sale_term_count,
+                "safety_term_count": signals.safety_term_count,
+                "critical_term_count": signals.critical_term_count,
+                "has_crime_signal": signals.has_crime_signal,
+                "has_broker_signal": signals.has_broker_signal,
+                "has_registry_signal": signals.has_registry_signal,
+                "has_safety_signal": signals.has_safety_signal,
+                "has_critical_signal": signals.has_critical_signal,
+                "legal_category": template["legal_category"],
+                "combined_text": str(template["text"]),
+                SCORE_COLUMN: round(score, 2),
+                TARGET_COLUMN: label,
+            }
+        )
+    return rows
+
+
 def build_derived_contract_dataset(
     seed: int = 42,
     safe_examples: int = 18000,
@@ -1804,8 +2111,9 @@ def build_derived_contract_dataset(
     counterfactual_examples: int = 16000,
     emerging_examples: int = 18000,
     user_phrase_examples: int = 9000,
+    colloquial_examples: int = 8000,
 ) -> pd.DataFrame:
-    # 최종 학습 데이터 = 판례 파생 + 정상 기준 + 경계/스트레스 + 공개자료 지표 + 반례/현장패턴/사용자 문장 예시.
+    # 최종 학습 데이터 = 판례 파생 + 정상 기준 + 경계/스트레스 + 공개자료 지표 + 반례/현장패턴/사용자 문장/구어체 예시.
     rng = random.Random(seed)
     case_rows = load_case_rows()
     derived = [
@@ -1819,6 +2127,7 @@ def build_derived_contract_dataset(
     derived.extend(_counterfactual_stress_examples(counterfactual_examples, rng))
     derived.extend(_emerging_pattern_examples(emerging_examples, rng))
     derived.extend(_user_phrase_variation_examples(user_phrase_examples, rng))
+    derived.extend(_colloquial_text_only_examples(colloquial_examples, rng))
     df = pd.DataFrame(derived)
     df = _refresh_text_signal_columns(df)
     df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
@@ -1856,7 +2165,7 @@ def write_data_quality_report(df: pd.DataFrame, path: Path = DATA_DIR / "data_qu
         "duplicate_rows": int(df.duplicated().sum()),
         "jeonse_ratio_quantiles": df["jeonse_ratio"].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.99, 1]).round(4).to_dict(),
         "debt_ratio_quantiles": df["debt_ratio"].quantile([0, 0.25, 0.5, 0.75, 0.9, 0.99, 1]).round(4).to_dict(),
-        "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시, 사용자 자연어 입력 변형 예시를 결합했다. 실제 피해자 원천 기록은 아니다.",
+        "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시, 사용자 자연어 입력 변형 예시, 구어체 텍스트-only 입력 예시를 결합했다. 실제 피해자 원천 기록은 아니다.",
     }
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -2421,6 +2730,130 @@ def create_manual_scenarios(path: Path = MANUAL_SCENARIOS_CSV) -> pd.DataFrame:
             "contract_period_months": 24,
             "special_clause_text": "다른 임차인 보증금 총액과 선순위보증금 명세는 계약 후 알려주겠다고 한다.",
             "user_situation_text": "같은 호실에 중복계약이 있다는 얘기를 들었고 다중 임차인 보증금이 숨겨진 것 같다.",
+        },
+        {
+            "scenario_id": "REALISTIC_019",
+            "name": "체크 누락 압류 구어체 입력",
+            "expected_min_score": 72,
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 170,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 430,
+            "mortgage_million": 0,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": False,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": False,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": 0,
+            "contract_period_months": 24,
+            "special_clause_text": "",
+            "user_situation_text": "등기부에 압류가 있다는데 집주인이 곧 풀린다더라 그냥 계약해도 된다네요.",
+        },
+        {
+            "scenario_id": "REALISTIC_020",
+            "name": "체크 누락 신탁원부 구어체 입력",
+            "expected_min_score": 72,
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "region": "수도권",
+            "deposit_million": 180,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 370,
+            "mortgage_million": 0,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": False,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": False,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": 0,
+            "contract_period_months": 24,
+            "special_clause_text": "",
+            "user_situation_text": "신탁 표시가 있는데 신탁원부 없어도 된대요. 수탁자 동의는 나중에 받자고 합니다.",
+        },
+        {
+            "scenario_id": "REALISTIC_021",
+            "name": "구어체 안전 확인 전세",
+            "expected_max_score": 36,
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 220,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 560,
+            "mortgage_million": 0,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": False,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": False,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": -3,
+            "contract_period_months": 24,
+            "special_clause_text": "",
+            "user_situation_text": "등기부 깨끗하고 갑구 을구 깨끗, 보증보험 가능, 확정일자랑 전입 바로 가능해요.",
+        },
+        {
+            "scenario_id": "REALISTIC_022",
+            "name": "보증보험 불가만 자연어로 입력한 고전세가율",
+            "expected_min_score": 64,
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 260,
+            "monthly_rent_million": 0,
+            "sale_price_million": 0,
+            "estimated_market_price_million": 310,
+            "mortgage_million": 20,
+            "senior_claim_million": 0,
+            "seizure": False,
+            "provisional_seizure": False,
+            "trust_registered": False,
+            "illegal_building": False,
+            "landlord_multiple_properties": False,
+            "landlord_prior_incidents": False,
+            "broker_unregistered": False,
+            "broker_advertising_issue": False,
+            "suspicious_special_clause": False,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": 18,
+            "contract_period_months": 24,
+            "special_clause_text": "",
+            "user_situation_text": "보증보험 안 된다는데 이유를 안 알려줍니다. 시세보다 보증금이 높은 편이라 불안합니다.",
         },
     ]
     df = pd.DataFrame(scenarios)

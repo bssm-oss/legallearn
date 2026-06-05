@@ -164,3 +164,55 @@ def test_emerging_text_risk_patterns_are_handled():
     assert delayed_move_in["risk_score"] >= 76
     assert delayed_move_in["risk_grade"] == "위험"
     assert verified_proxy["risk_score"] < 45
+
+
+def test_colloquial_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    text_only_seizure = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 170,
+            "estimated_market_price_million": 430,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "등기부에 압류가 있다는데 집주인이 곧 풀린다더라 그냥 계약해도 된다네요.",
+        }
+    )
+    text_only_trust = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "officetel",
+            "region": "수도권",
+            "deposit_million": 180,
+            "estimated_market_price_million": 370,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "신탁 표시가 있는데 신탁원부 없어도 된대요. 수탁자 동의는 나중에 받자고 합니다.",
+        }
+    )
+    colloquial_safe = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 220,
+            "estimated_market_price_million": 560,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "user_situation_text": "등기부 깨끗하고 갑구 을구 깨끗, 보증보험 가능, 확정일자랑 전입 바로 가능해요.",
+        }
+    )
+    assert text_only_seizure["risk_grade"] == "위험"
+    assert text_only_seizure["risk_score"] >= 72
+    assert text_only_trust["risk_grade"] == "위험"
+    assert text_only_trust["risk_score"] >= 72
+    assert colloquial_safe["risk_score"] < 45
+    assert colloquial_safe["risk_grade"] == "안전"

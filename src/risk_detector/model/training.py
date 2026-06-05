@@ -53,7 +53,7 @@ def _prepare_features(df: pd.DataFrame) -> pd.DataFrame:
     return prepared
 
 
-def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 460) -> Pipeline:
+def build_bagging_pipeline(random_state: int = 42, n_estimators: int = 520) -> Pipeline:
     # 수치, 범주, 불리언, 텍스트를 각각 전처리한 뒤 BaggingClassifier가 함께 학습한다.
     numeric_pipeline = Pipeline(
         steps=[
@@ -255,7 +255,7 @@ def write_training_report(
 - 학습 행 수: {metadata['train_rows']}
 - 검증 행 수: {metadata['validation_rows']}
 - 홀드아웃 테스트 행 수: {metadata['holdout_rows']}
-- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시 + 사용자 자연어 입력 변형 예시
+- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시 + 사용자 자연어 입력 변형 예시 + 구어체 텍스트-only 입력 예시
 - 누수 방지: 같은 `source_case_number` 그룹이 학습/검증/홀드아웃에 동시에 들어가지 않도록 분리
 
 데이터 소스 분포:
@@ -413,7 +413,7 @@ def write_manual_scenario_predictions(learning_dir: Path = LEARNING_DIR) -> None
 def train_model(
     rebuild_data: bool = True,
     random_state: int = 42,
-    n_estimators: int = 460,
+    n_estimators: int = 520,
 ) -> dict[str, object]:
     df = load_training_frame(rebuild=rebuild_data)
     df = _prepare_features(df)
@@ -448,8 +448,8 @@ def train_model(
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "algorithm": "sklearn.ensemble.BaggingClassifier",
         "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-        "training_profile": "natural_language_augmented_offline_demo",
-        "additional_training_strategy": "Added counterfactual, emerging field-pattern, and natural-language user phrase examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, and double-contract patterns; increased Bagging ensemble capacity while keeping grouped validation.",
+        "training_profile": "colloquial_text_robust_offline_demo",
+        "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, and colloquial text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, and informal user minimization patterns; increased Bagging ensemble capacity while keeping grouped validation.",
         "random_state": random_state,
         "n_estimators": n_estimators,
         "model_path": str(MODEL_PATH),

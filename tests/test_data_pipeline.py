@@ -22,6 +22,7 @@ def test_build_derived_contract_dataset_has_required_columns():
         counterfactual_examples=30,
         emerging_examples=36,
         user_phrase_examples=36,
+        colloquial_examples=36,
     )
     assert len(df) >= 900
     for column in MODEL_FEATURES + [TARGET_COLUMN]:
@@ -46,10 +47,14 @@ def test_build_derived_contract_dataset_has_required_columns():
             "synthetic_user_phrase_safe",
             "synthetic_user_phrase_caution",
             "synthetic_user_phrase_danger",
+            "synthetic_colloquial_safe",
+            "synthetic_colloquial_caution",
+            "synthetic_colloquial_danger",
         ]
     ).all()
     assert df["source"].str.startswith("synthetic_counterfactual").any()
     assert df["source"].str.startswith("synthetic_emerging").any()
     assert df["source"].str.startswith("synthetic_user_phrase").any()
+    assert df["source"].str.startswith("synthetic_colloquial").any()
     assert df["safety_term_count"].max() > 0
     assert df["critical_term_count"].max() > 0

@@ -93,11 +93,39 @@ def infer_legal_category(contract: ContractInput) -> str:
     return "civil_lease_definition"
 
 
+def _text_risk_flags(text: str) -> dict[str, bool]:
+    # 체크박스를 누락하고 자유 입력란에만 위험을 적는 실제 사용 패턴을 좁은 키워드 조합으로 보정한다.
+    safe_resolution_terms = [
+        "권리침해 없음",
+        "등기부 깨끗",
+        "갑구 을구 깨끗",
+        "말소 완료",
+        "말소등기 완료",
+        "신탁원부 확인 완료",
+        "수탁자 동의 완료",
+        "보증보험 가능",
+    ]
+    has_safe_resolution = any(term in text for term in safe_resolution_terms)
+    registry_risk = any(term in text for term in ["압류 있는데", "압류가", "압류 표시", "가압류", "가처분", "곧 풀린다"]) and not has_safe_resolution
+    trust_risk = any(term in text for term in ["신탁원부 없어도", "신탁 표시", "신탁등기", "수탁자 동의 나중", "임대 권한 불명"]) and not any(
+        term in text for term in ["신탁원부 확인 완료", "수탁자 동의 완료"]
+    )
+    no_guarantee_risk = any(term in text for term in ["보증보험 불가", "보증보험 안", "보증보험 안됨", "보증보험 가입이 안", "보증보험 어렵"])
+    return {
+        "registry_text_risk": registry_risk,
+        "trust_text_risk": trust_risk,
+        "no_guarantee_text_risk": no_guarantee_risk,
+    }
+
+
 def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
     # 모델 학습 때 사용한 파생 피처와 같은 형태로 사용자 계약 입력을 변환한다.
     market = max(contract.estimated_market_price_million, 1.0)
     jeonse_ratio = contract.deposit_million / market
     debt_ratio = (contract.deposit_million + contract.mortgage_million + contract.senior_claim_million) / market
+    user_text = f"{contract.special_clause_text} {contract.user_situation_text}"
+    text_flags = _text_risk_flags(user_text)
+    has_text_risk = any(text_flags.values())
     has_registry_risk = contract.seizure or contract.provisional_seizure or contract.trust_registered
     has_contract_risk = (
         has_registry_risk
@@ -106,7 +134,9 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
         or contract.broker_unregistered
         or contract.broker_advertising_issue
         or contract.suspicious_special_clause
+        or has_text_risk
     )
+    guarantee_text = "보증보험 불가" if (not contract.guarantee_insurance_available or text_flags["no_guarantee_text_risk"]) else "보증보험 가능"
     text = " ".join(
         [
             contract.contract_type,
@@ -114,10 +144,10 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             contract.region,
             contract.special_clause_text,
             contract.user_situation_text,
-            "신탁" if contract.trust_registered else "",
-            "압류 가압류" if contract.seizure or contract.provisional_seizure else "",
+            "신탁" if contract.trust_registered or text_flags["trust_text_risk"] else "",
+            "압류 가압류" if contract.seizure or contract.provisional_seizure or text_flags["registry_text_risk"] else "",
             "위반건축물" if contract.illegal_building else "",
-            "보증보험 불가" if not contract.guarantee_insurance_available else "보증보험 가능",
+            guarantee_text,
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -180,6 +210,7 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
     def has_any(terms: list[str]) -> bool:
         return any(term in combined_text for term in terms)
 
+    text_flags = _text_risk_flags(combined_text)
     identity_mismatch = has_any(["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
         "불일치" in combined_text and any(term in combined_text for term in ["명의", "신분증", "소유자"])
     )
@@ -237,6 +268,12 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(9, "중개대상물 확인·설명이 충분하지 않은 것으로 입력되었습니다.", "warning", False)
     if abs(contract.nearby_market_gap_percent) >= 15:
         add(12, "주변 시세 대비 보증금/가격 괴리가 큽니다.", "warning", f"{contract.nearby_market_gap_percent:.1f}%")
+    if text_flags["registry_text_risk"]:
+        add(24, "자유 입력 문장에 압류·가압류 등 등기부 권리침해 정황이 있습니다.", "danger", True)
+    if text_flags["trust_text_risk"]:
+        add(22, "자유 입력 문장에 신탁원부 또는 수탁자 동의 미확인 정황이 있습니다.", "danger", True)
+    if text_flags["no_guarantee_text_risk"] and contract.contract_type != "sale":
+        add(16, "자유 입력 문장에 보증보험 가입 불가 또는 거절 정황이 있습니다.", "danger", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -296,6 +333,13 @@ class RiskScorer:
         if contract.landlord_prior_incidents and not contract.guarantee_insurance_available:
             final_score = max(final_score, 76.0)
         text = f"{contract.special_clause_text} {contract.user_situation_text}"
+        text_flags = _text_risk_flags(text)
+        if text_flags["registry_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["trust_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["no_guarantee_text_risk"] and contract.contract_type != "sale":
+            final_score = max(final_score, 64.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
         )
