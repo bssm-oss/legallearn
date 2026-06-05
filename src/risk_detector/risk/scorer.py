@@ -128,6 +128,41 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
     reservation_deposit_risk = "가계약금" in text and any(term in text for term in ["환불불가", "계약서 보기 전", "먼저 송금"]) and not any(
         term in text for term in ["가계약금 환불 가능", "계약서 확인 완료", "환불 가능"]
     )
+    priority_safe = any(
+        term in text
+        for term in [
+            "전입세대열람 확인 완료",
+            "확정일자 부여현황 확인 완료",
+            "선순위 보증금 총액 확인 완료",
+            "전체 선순위 보증금 확인 완료",
+        ]
+    )
+    priority_disclosure_risk = (
+        any(term in text for term in ["전입세대열람", "전입세대 열람", "확정일자 부여현황"])
+        and any(term in text for term in ["못 보여", "안 보여", "거부", "집주인만", "확인 어렵"])
+        and not priority_safe
+    )
+    senior_deposit_unknown_risk = (
+        any(term in text for term in ["선순위 임차보증금 총액", "선순위 보증금 총액", "방마다 보증금", "전체 선순위 보증금"])
+        and any(term in text for term in ["모른", "안 알려", "확인 어렵", "개인정보"])
+        and not priority_safe
+    )
+    auction_safe = any(term in text for term in ["경매 공매 없음", "경매 없음", "공매 없음", "취하 완료", "말소 완료"])
+    auction_risk = any(
+        term in text for term in ["경매개시결정", "임의경매개시결정", "강제경매개시결정", "경매개시", "공매 예고", "공매 통지"]
+    ) and not auction_safe
+    ownership_safe = any(term in text for term in ["소유자 변경 없음", "매도인 임대인 일치", "승계 확인 완료", "소유자 확인 완료"])
+    ownership_change_risk = any(
+        term in text for term in ["소유자가 바뀔", "소유자 변경", "매매와 전세를 동시에", "전세를 동시에", "동시진행", "갭투자 승계"]
+    ) and not ownership_safe
+    same_day_loan_safe = any(term in text for term in ["잔금 당일 대출 없음", "전입 후 대출 금지 특약", "당일 근저당 없음"])
+    same_day_loan_risk = (
+        (
+            any(term in text for term in ["잔금 당일", "전입신고 전에", "전입 전에"])
+            and any(term in text for term in ["대출", "근저당"])
+        )
+        or "대출을 먼저 실행" in text
+    ) and not same_day_loan_safe
     return {
         "registry_text_risk": registry_risk,
         "trust_text_risk": trust_risk,
@@ -139,6 +174,11 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "lease_registration_text_risk": lease_registration_risk,
         "unregistered_text_risk": unregistered_risk,
         "reservation_deposit_text_risk": reservation_deposit_risk,
+        "priority_disclosure_text_risk": priority_disclosure_risk,
+        "senior_deposit_unknown_text_risk": senior_deposit_unknown_risk,
+        "auction_text_risk": auction_risk,
+        "ownership_change_text_risk": ownership_change_risk,
+        "same_day_loan_text_risk": same_day_loan_risk,
     }
 
 
@@ -183,6 +223,11 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             "임차권등기명령 말소 미확인" if text_flags["lease_registration_text_risk"] else "",
             "미등기 사용승인 전" if text_flags["unregistered_text_risk"] else "",
             "가계약금 환불불가 계약서 보기 전" if text_flags["reservation_deposit_text_risk"] else "",
+            "전입세대열람 확정일자 부여현황 미제공" if text_flags["priority_disclosure_text_risk"] else "",
+            "선순위 임차보증금 총액 불명" if text_flags["senior_deposit_unknown_text_risk"] else "",
+            "경매개시결정 공매 예고" if text_flags["auction_text_risk"] else "",
+            "소유자 변경 매매 전세 동시진행" if text_flags["ownership_change_text_risk"] else "",
+            "잔금 당일 대출 전입 전 근저당" if text_flags["same_day_loan_text_risk"] else "",
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -323,6 +368,16 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(22, "미등기 또는 사용승인 전 신축으로 권리관계 확인이 어렵습니다.", "danger", True)
     if text_flags["reservation_deposit_text_risk"]:
         add(16, "계약서 확인 전 가계약금 환불불가 또는 선송금 압박이 있습니다.", "warning", True)
+    if text_flags["priority_disclosure_text_risk"]:
+        add(18, "전입세대열람 또는 확정일자 부여현황 확인을 거부하는 정황이 있습니다.", "warning", True)
+    if text_flags["senior_deposit_unknown_text_risk"]:
+        add(22, "선순위 임차보증금 총액을 확인할 수 없어 보증금 회수 순위가 불명확합니다.", "danger", True)
+    if text_flags["auction_text_risk"]:
+        add(26, "경매개시결정 또는 공매 예고 정황이 있어 계약 전 권리관계 확인이 필요합니다.", "danger", True)
+    if text_flags["ownership_change_text_risk"]:
+        add(20, "계약 전후 소유자 변경 또는 매매·전세 동시진행 정황이 있습니다.", "danger", True)
+    if text_flags["same_day_loan_text_risk"]:
+        add(22, "잔금 당일 대출 선행 또는 전입 전 근저당 설정 위험이 있습니다.", "danger", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -405,6 +460,16 @@ class RiskScorer:
             final_score = max(final_score, 74.0)
         if text_flags["reservation_deposit_text_risk"]:
             final_score = max(final_score, 64.0)
+        if text_flags["priority_disclosure_text_risk"]:
+            final_score = max(final_score, 66.0)
+        if text_flags["senior_deposit_unknown_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["auction_text_risk"]:
+            final_score = max(final_score, 78.0)
+        if text_flags["ownership_change_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["same_day_loan_text_risk"]:
+            final_score = max(final_score, 76.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
         )

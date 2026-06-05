@@ -371,3 +371,83 @@ def test_tenancy_title_text_only_inputs_are_not_missed():
     assert non_refundable_reservation["risk_score"] >= 64
     assert safe_sublease_like["risk_grade"] == "안전"
     assert safe_sublease_like["risk_score"] < 45
+
+
+def test_priority_auction_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    base = {
+        "contract_type": "jeonse",
+        "property_type": "villa",
+        "region": "수도권",
+        "deposit_million": 210,
+        "estimated_market_price_million": 420,
+        "guarantee_insurance_available": True,
+        "fixed_date_ready": True,
+        "move_in_ready": True,
+        "broker_explained_rights": True,
+    }
+    tenant_registry_hidden = scorer.score(
+        {
+            **base,
+            "property_type": "multi_family",
+            "user_situation_text": "다가구인데 전입세대열람을 못 보여준다고 하고 확정일자 부여현황도 집주인만 볼 수 있다며 안 보여줍니다.",
+        }
+    )
+    priority_deposit_unknown = scorer.score(
+        {
+            **base,
+            "contract_type": "monthly_rent",
+            "property_type": "multi_family",
+            "deposit_million": 70,
+            "monthly_rent_million": 0.75,
+            "estimated_market_price_million": 260,
+            "user_situation_text": "선순위 임차보증금 총액을 모른다고 하고 방마다 보증금 내역은 개인정보라 확인이 어렵다고 합니다.",
+        }
+    )
+    auction_notice = scorer.score(
+        {
+            **base,
+            "user_situation_text": "등기부에 임의경매개시결정이 보이는데 집주인이 곧 취하될 거라며 계약해도 된다고 합니다.",
+        }
+    )
+    public_auction_tax = scorer.score(
+        {
+            **base,
+            "property_type": "officetel",
+            "user_situation_text": "공매 예고 통지를 받았다는 말이 있는데 세금 체납은 곧 해결한다고 합니다.",
+        }
+    )
+    owner_change_same_day = scorer.score(
+        {
+            **base,
+            "user_situation_text": "계약일과 잔금일 사이에 소유자가 바뀔 수 있고 매매와 전세를 동시에 진행한다고 합니다.",
+        }
+    )
+    same_day_loan_after_movein = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "잔금 당일 전입신고 전에 집주인이 대출을 먼저 실행해야 한다고 합니다.",
+        }
+    )
+    safe_registry_priority = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "전입세대열람 확인 완료 확정일자 부여현황 확인 완료 선순위 보증금 총액 확인 완료 경매 공매 없음 소유자 변경 없음 잔금 당일 대출 없음입니다.",
+        }
+    )
+    assert tenant_registry_hidden["risk_grade"] in {"주의", "위험"}
+    assert tenant_registry_hidden["risk_score"] >= 66
+    assert priority_deposit_unknown["risk_grade"] == "위험"
+    assert priority_deposit_unknown["risk_score"] >= 72
+    assert auction_notice["risk_grade"] == "위험"
+    assert auction_notice["risk_score"] >= 78
+    assert public_auction_tax["risk_grade"] == "위험"
+    assert public_auction_tax["risk_score"] >= 78
+    assert owner_change_same_day["risk_grade"] == "위험"
+    assert owner_change_same_day["risk_score"] >= 72
+    assert same_day_loan_after_movein["risk_grade"] == "위험"
+    assert same_day_loan_after_movein["risk_score"] >= 76
+    assert safe_registry_priority["risk_grade"] == "안전"
+    assert safe_registry_priority["risk_score"] < 45
