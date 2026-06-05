@@ -1,36 +1,39 @@
 {
-  "trained_at": "2026-06-05T04:11:18.164739+00:00",
+  "trained_at": "2026-06-05T04:24:24.869272+00:00",
   "algorithm": "sklearn.ensemble.BaggingClassifier",
   "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-  "training_profile": "counterfactual_augmented_offline_demo",
-  "additional_training_strategy": "Added counterfactual safe/caution/danger stress examples and increased Bagging ensemble capacity while keeping grouped validation.",
+  "training_profile": "emerging_pattern_augmented_offline_demo",
+  "additional_training_strategy": "Added counterfactual and emerging field-pattern examples for identity mismatch, delayed move-in/same-day mortgage, tax arrears, double contracts, and verified safe proxy contracts; increased Bagging ensemble capacity while keeping grouped validation.",
   "random_state": 42,
-  "n_estimators": 320,
+  "n_estimators": 400,
   "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
   "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
   "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
-  "rows": 82488,
+  "rows": 100488,
   "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
-  "train_rows": 53798,
-  "validation_rows": 11738,
-  "holdout_rows": 16952,
+  "train_rows": 65822,
+  "validation_rows": 14546,
+  "holdout_rows": 20120,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
+    "synthetic_emerging_danger": 9000,
     "public_indicator_danger": 7200,
     "synthetic_counterfactual_danger": 6400,
     "synthetic_counterfactual_caution": 4800,
     "synthetic_counterfactual_safe": 4800,
-    "synthetic_hard_danger": 3334,
+    "synthetic_emerging_safe": 4500,
+    "synthetic_emerging_caution": 4500,
     "synthetic_hard_caution": 3334,
+    "synthetic_hard_danger": 3334,
     "synthetic_hard_safe": 3332,
-    "public_indicator_safe": 2400,
-    "public_indicator_caution": 2400
+    "public_indicator_caution": 2400,
+    "public_indicator_safe": 2400
   },
   "label_counts": {
-    "안전": 29008,
-    "주의": 26886,
-    "위험": 26594
+    "안전": 33508,
+    "주의": 31218,
+    "위험": 35762
   },
   "features": [
     "deposit_million",
@@ -118,56 +121,56 @@
     "2": "위험"
   },
   "validation_metrics": {
-    "accuracy": 0.9836,
-    "balanced_accuracy": 0.9836,
-    "macro_f1": 0.9837,
-    "weighted_f1": 0.9836,
-    "macro_precision": 0.9837,
-    "macro_recall": 0.9836,
-    "rows": 11738,
+    "accuracy": 0.99,
+    "balanced_accuracy": 0.9898,
+    "macro_f1": 0.9899,
+    "weighted_f1": 0.99,
+    "macro_precision": 0.9901,
+    "macro_recall": 0.9898,
+    "rows": 14546,
     "confusion_matrix": [
       [
-        4077,
-        56,
+        4696,
+        0,
         0
       ],
       [
-        59,
-        3851,
-        36
+        56,
+        4528,
+        55
       ],
       [
         0,
-        42,
-        3617
+        34,
+        5177
       ]
     ]
   },
   "metrics": {
-    "accuracy": 0.9736,
-    "balanced_accuracy": 0.9735,
-    "macro_f1": 0.9733,
-    "weighted_f1": 0.9737,
-    "macro_precision": 0.9733,
-    "macro_recall": 0.9735,
-    "rows": 16952,
+    "accuracy": 0.9847,
+    "balanced_accuracy": 0.9846,
+    "macro_f1": 0.9844,
+    "weighted_f1": 0.9847,
+    "macro_precision": 0.9843,
+    "macro_recall": 0.9846,
+    "rows": 20120,
     "confusion_matrix": [
       [
-        5638,
-        140,
+        6640,
+        84,
         0
       ],
       [
-        87,
-        5242,
-        73
+        0,
+        5971,
+        112
       ],
       [
         0,
-        148,
-        5624
+        112,
+        7201
       ]
     ],
-    "test_rows": 16952
+    "test_rows": 20120
   }
 }

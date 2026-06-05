@@ -11,7 +11,7 @@ PYTHONPATH=src .venv/bin/python -m pytest
 결과:
 
 ```text
-7 passed in 3.86s
+8 passed in 4.75s
 ```
 
 ## 테스트 범위
@@ -20,8 +20,9 @@ PYTHONPATH=src .venv/bin/python -m pytest
 - 파생 데이터 생성: 모델 필수 컬럼과 `안전/주의/위험` 라벨 포함 확인
 - 모델 구조: `sklearn.ensemble.BaggingClassifier` 사용 확인
 - 스코어링: 고위험 입력과 저위험 입력의 점수/등급 차이 확인
-- 현실형 사례: 데이터셋에 없는 14개 사용자 시나리오 기준 점수 범위 확인
+- 현실형 사례: 데이터셋에 없는 18개 사용자 시나리오 기준 점수 범위 확인
 - 반례 검증: 낮은 전세가율+압류, 낮은 부채비율+신탁, 높은 전세가율 단독 경계 입력 확인
+- 현장패턴 검증: 임대인 명의 불일치, 전입신고 지연/당일 근저당, 안전한 대리계약 확인
 - 정상 계약 사례: 일부 안전 시나리오에서 Bagging 모델 단독 예측도 `안전`인지 확인
 
 ## 현실형 수동 시나리오 결과
@@ -48,6 +49,10 @@ PYTHONPATH=src .venv/bin/python -m pytest
 | 근저당 일부 있지만 말소특약이 명확한 매매 | 안전 |
 | 전세가율만 높은 보증보험 가능 오피스텔 | 주의 |
 | 보증금은 낮지만 신탁원부 미확인 전세 | 위험 |
+| 임대인 명의 불일치 대리계약 | 위험 |
+| 전입신고 지연 요구 + 당일 근저당 우려 | 위험 |
+| 대리계약 서류 확인 완료 안전 전세 | 안전 |
+| 다가구 이중계약과 선순위보증금 은폐 의심 | 위험 |
 
 ## API 및 웹 시연 검증
 
@@ -61,7 +66,7 @@ PYTHONPATH=src .venv/bin/python scripts/run_web.py --host 127.0.0.1 --port 8765
 
 - `GET /api/health`: 200, `model_exists=true`
 - `GET /static/risk-illustration.svg`: 200, `image/svg+xml`
-- `POST /api/predict`: 200, 안전 전세 예시 `안전 15.5점`
+- `POST /api/predict`: 200, 안전 대리계약 예시 `안전 34.4점`, 명의 불일치 대리계약 예시 `위험 74.0점`
 - 브라우저 콘솔: 메시지 없음
 - 네트워크: `/predict` POST 200, `risk-illustration.svg` GET 200
 

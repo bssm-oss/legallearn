@@ -108,15 +108,15 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 
 최근 학습 결과:
 
-- 전체 데이터: `82,488`행
-- 학습/검증/홀드아웃: `53,798 / 11,738 / 16,952`
-- Validation Macro F1: `0.9837`
-- Holdout Accuracy: `0.9736`
-- Holdout Balanced Accuracy: `0.9735`
-- Holdout Macro F1: `0.9733`
-- Holdout Weighted F1: `0.9737`
-- Bagging estimators: `320`
-- 추가학습: 전세가율만 높거나 낮은데 법적 신호가 엇갈리는 반례 `16,000`건 추가
+- 전체 데이터: `100,488`행
+- 학습/검증/홀드아웃: `65,822 / 14,546 / 20,120`
+- Validation Macro F1: `0.9899`
+- Holdout Accuracy: `0.9847`
+- Holdout Balanced Accuracy: `0.9846`
+- Holdout Macro F1: `0.9844`
+- Holdout Weighted F1: `0.9847`
+- Bagging estimators: `400`
+- 추가학습: 전세가율·법적 신호 반례 `16,000`건 + 신원/대항력/체납/이중계약 현장패턴 `18,000`건 추가
 - 분리 방식: `source_case_number` 기준 그룹 분리
 
 학습 과정 설명 노트북:
@@ -141,8 +141,8 @@ PYTHONPATH=src .venv/bin/python scripts/predict.py --json '{
 
 - 로컬 주소: `http://127.0.0.1:8765`
 - API health: `GET /api/health` 200, `model_exists=true`
-- API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 15.5점`, 고위험 기본 예시 `위험 86.0점`
-- 자동 테스트: `7 passed in 3.86s`
+- API 예측: `POST /api/predict` 200, 안전 전세 예시 `안전 34.4점`, 고위험 기본 예시 `위험 85.9점`
+- 자동 테스트: `8 passed in 4.75s`
 - 브라우저 콘솔: 메시지 없음
 - 데스크톱/모바일 캡처:
   - `학습과정/web_demo_desktop_final.png`
@@ -163,6 +163,7 @@ flowchart LR
   B["공개자료 위험 지표"] --> D
   C["정상/경계/위험 예시"] --> D
   I["추가 반례 예시"] --> D
+  J["신원/대항력/체납/이중계약 현장패턴"] --> D
   D --> E["전처리: 수치, 범주, 불리언, 텍스트"]
   E --> F["BaggingClassifier 학습"]
   F --> G["Validation / Holdout 평가"]
@@ -178,7 +179,7 @@ flowchart LR
 - 건축물 위험: 위반건축물 여부
 - 임대인/중개사 위험: 임대인 사고 이력, 다주택 반환 부담, 무등록 중개, 허위·과장 광고, 확인설명 부족
 - 보호 요건: 전입신고, 확정일자, 보증보험 가능 여부
-- 텍스트: 계약서 특약, 사용자 상황, 판례 기반 위험 키워드
+- 텍스트: 계약서 특약, 사용자 상황, 판례 기반 위험 키워드, 명의 불일치, 대리권 서류 미확인, 전입신고 지연, 당일 근저당, 체납, 이중계약 신호
 
 ## 오프라인 공개자료 기준
 
