@@ -1,45 +1,48 @@
 {
-  "trained_at": "2026-06-05T04:54:55.123554+00:00",
+  "trained_at": "2026-06-05T05:10:26.370156+00:00",
   "algorithm": "sklearn.ensemble.BaggingClassifier",
   "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-  "training_profile": "colloquial_text_robust_offline_demo",
-  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, and colloquial text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, and informal user minimization patterns; increased Bagging ensemble capacity while keeping grouped validation.",
+  "training_profile": "payment_building_text_robust_offline_demo",
+  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, and payment/building text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, and pressure-to-pay patterns; increased Bagging ensemble capacity while keeping grouped validation.",
   "random_state": 42,
-  "n_estimators": 520,
+  "n_estimators": 560,
   "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
   "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
   "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
-  "rows": 117488,
+  "rows": 123488,
   "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
-  "train_rows": 77163,
-  "validation_rows": 17102,
-  "holdout_rows": 23223,
+  "train_rows": 81099,
+  "validation_rows": 17885,
+  "holdout_rows": 24504,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
     "synthetic_emerging_danger": 9000,
     "public_indicator_danger": 7200,
     "synthetic_counterfactual_danger": 6400,
-    "synthetic_counterfactual_caution": 4800,
     "synthetic_counterfactual_safe": 4800,
+    "synthetic_counterfactual_caution": 4800,
     "synthetic_user_phrase_danger": 4500,
     "synthetic_emerging_caution": 4500,
     "synthetic_emerging_safe": 4500,
     "synthetic_colloquial_danger": 4305,
-    "synthetic_hard_caution": 3334,
     "synthetic_hard_danger": 3334,
+    "synthetic_hard_caution": 3334,
+    "synthetic_payment_building_danger": 3332,
     "synthetic_hard_safe": 3332,
-    "public_indicator_safe": 2400,
     "public_indicator_caution": 2400,
-    "synthetic_user_phrase_safe": 2250,
+    "public_indicator_safe": 2400,
     "synthetic_user_phrase_caution": 2250,
+    "synthetic_user_phrase_safe": 2250,
     "synthetic_colloquial_safe": 1848,
-    "synthetic_colloquial_caution": 1847
+    "synthetic_colloquial_caution": 1847,
+    "synthetic_payment_building_caution": 1334,
+    "synthetic_payment_building_safe": 1334
   },
   "label_counts": {
-    "안전": 37606,
-    "주의": 35315,
-    "위험": 44567
+    "안전": 38940,
+    "주의": 36649,
+    "위험": 47899
   },
   "features": [
     "deposit_million",
@@ -135,56 +138,56 @@
     "2": "위험"
   },
   "validation_metrics": {
-    "accuracy": 0.9828,
-    "balanced_accuracy": 0.9819,
-    "macro_f1": 0.9827,
-    "weighted_f1": 0.9828,
-    "macro_precision": 0.9837,
-    "macro_recall": 0.9819,
-    "rows": 17102,
+    "accuracy": 0.9952,
+    "balanced_accuracy": 0.9949,
+    "macro_f1": 0.995,
+    "weighted_f1": 0.9952,
+    "macro_precision": 0.9951,
+    "macro_recall": 0.9949,
+    "rows": 17885,
     "confusion_matrix": [
       [
-        5332,
-        84,
+        5447,
+        28,
         0
       ],
       [
-        0,
-        5156,
-        194
+        23,
+        5340,
+        23
       ],
       [
         0,
-        16,
-        6320
+        11,
+        7013
       ]
     ]
   },
   "metrics": {
-    "accuracy": 0.9784,
-    "balanced_accuracy": 0.9773,
-    "macro_f1": 0.9774,
-    "weighted_f1": 0.9784,
-    "macro_precision": 0.9776,
-    "macro_recall": 0.9773,
-    "rows": 23223,
+    "accuracy": 0.9837,
+    "balanced_accuracy": 0.983,
+    "macro_f1": 0.9826,
+    "weighted_f1": 0.9837,
+    "macro_precision": 0.9824,
+    "macro_recall": 0.983,
+    "rows": 24504,
     "confusion_matrix": [
       [
-        7373,
-        196,
+        7619,
+        252,
         0
       ],
       [
-        56,
-        6524,
-        161
+        39,
+        6971,
+        58
       ],
       [
         0,
-        89,
-        8824
+        51,
+        9514
       ]
     ],
-    "test_rows": 23223
+    "test_rows": 24504
   }
 }

@@ -20,4 +20,8 @@ REALISTIC_018,다가구 이중계약과 선순위보증금 은폐 의심,78.0,mo
 REALISTIC_019,체크 누락 압류 구어체 입력,72.0,jeonse,apartment,수도권,170,0.0,0,430,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,등기부에 압류가 있다는데 집주인이 곧 풀린다더라 그냥 계약해도 된다네요.,
 REALISTIC_020,체크 누락 신탁원부 구어체 입력,72.0,jeonse,officetel,수도권,180,0.0,0,370,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,신탁 표시가 있는데 신탁원부 없어도 된대요. 수탁자 동의는 나중에 받자고 합니다.,
 REALISTIC_021,구어체 안전 확인 전세,,jeonse,apartment,수도권,220,0.0,0,560,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,-3,24,,"등기부 깨끗하고 갑구 을구 깨끗, 보증보험 가능, 확정일자랑 전입 바로 가능해요.",36.0
-REALISTIC_022,보증보험 불가만 자연어로 입력한 고전세가율,64.0,jeonse,villa,수도권,260,0.0,0,310,20,0,False,False,False,False,False,False,False,False,False,True,True,True,True,18,24,,보증보험 안 된다는데 이유를 안 알려줍니다. 시세보다 보증금이 높은 편이라 불안합니다.,
+REALISTIC_022,보증보험 불가만 자연어로 입력한 고전세가율,70.0,jeonse,villa,수도권,260,0.0,0,310,20,0,False,False,False,False,False,False,False,False,False,True,True,True,True,18,24,,보증보험 안 된다는데 이유를 안 알려줍니다. 시세보다 보증금이 높은 편이라 불안합니다.,
+REALISTIC_023,계약금 계좌 명의 불일치 텍스트 입력,74.0,jeonse,villa,수도권,190,0.0,0,360,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,계약금은 집주인 말고 다른 사람 계좌로 보내래요. 계좌 명의가 임대인 이름이 아닙니다.,
+REALISTIC_024,불법증축 쪼개기 의심 텍스트 입력,70.0,monthly_rent,multi_family,수도권,70,0.7,0,240,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,원룸이 불법증축 쪼개기 방일 수 있다는데 건축물대장은 아직 못 봤습니다.,
+REALISTIC_025,법인 임대인 대표 개인계좌 요구,74.0,jeonse,officetel,수도권,220,0.0,0,330,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인이 법인인데 보증금 일부를 대표 개인계좌로 보내라고 합니다.,
+REALISTIC_026,등기부 확인 전 계약금 선입금 압박,64.0,jeonse,villa,수도권,230,0.0,0,310,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,오늘 계약금 먼저 넣어야 잡아준다고 하고 등기부는 나중에 보자고 합니다.,

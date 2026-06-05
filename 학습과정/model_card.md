@@ -6,8 +6,8 @@
 - 알고리즘: `sklearn.ensemble.BaggingClassifier`
 - 기본 추정기: `sklearn.tree.DecisionTreeClassifier`
 - 학습 데이터: `/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv`
-- 전체 행 수: 117488
-- 학습/검증/홀드아웃: 77163 / 17102 / 23223
+- 전체 행 수: 123488
+- 학습/검증/홀드아웃: 81099 / 17885 / 24504
 
 ## 입력과 출력
 
@@ -17,24 +17,24 @@
 
 ## 추가학습 구성
 
-- 학습 프로필: `colloquial_text_robust_offline_demo`
-- 보강 전략: Added counterfactual, emerging field-pattern, natural-language user phrase, and colloquial text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, and informal user minimization patterns; increased Bagging ensemble capacity while keeping grouped validation.
+- 학습 프로필: `payment_building_text_robust_offline_demo`
+- 보강 전략: Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, and payment/building text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, and pressure-to-pay patterns; increased Bagging ensemble capacity while keeping grouped validation.
 
 ## 평가 결과
 
 Validation:
 
-- Accuracy: 0.9828
-- Balanced Accuracy: 0.9819
-- Macro F1: 0.9827
-- Rows: 17102
+- Accuracy: 0.9952
+- Balanced Accuracy: 0.9949
+- Macro F1: 0.995
+- Rows: 17885
 
 Holdout:
 
-- Accuracy: 0.9784
-- Balanced Accuracy: 0.9773
-- Macro F1: 0.9774
-- Rows: 23223
+- Accuracy: 0.9837
+- Balanced Accuracy: 0.983
+- Macro F1: 0.9826
+- Rows: 24504
 
 ## 사용 범위
 
