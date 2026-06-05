@@ -1,0 +1,61 @@
+from risk_detector.risk.scorer import RiskScorer, contract_to_model_row, payload_to_contract
+
+
+def test_contract_to_model_row_computes_ratios():
+    contract = payload_to_contract(
+        {
+            "contract_type": "jeonse",
+            "deposit_million": 270,
+            "estimated_market_price_million": 300,
+            "mortgage_million": 60,
+            "senior_claim_million": 20,
+            "guarantee_insurance_available": False,
+        }
+    )
+    row = contract_to_model_row(contract)
+    assert row["jeonse_ratio"] == 0.9
+    assert row["debt_ratio"] > 1.1
+
+
+def test_trained_scorer_flags_high_and_low_risk():
+    scorer = RiskScorer()
+    high = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "villa",
+            "region": "수도권",
+            "deposit_million": 270,
+            "estimated_market_price_million": 290,
+            "mortgage_million": 115,
+            "senior_claim_million": 30,
+            "provisional_seizure": True,
+            "landlord_prior_incidents": True,
+            "broker_advertising_issue": True,
+            "suspicious_special_clause": True,
+            "guarantee_insurance_available": False,
+            "broker_explained_rights": False,
+            "nearby_market_gap_percent": 18,
+            "special_clause_text": "채권양도와 담보 제공에 이의를 제기하지 않는다.",
+        }
+    )
+    low = scorer.score(
+        {
+            "contract_type": "jeonse",
+            "property_type": "apartment",
+            "region": "수도권",
+            "deposit_million": 240,
+            "estimated_market_price_million": 520,
+            "mortgage_million": 0,
+            "senior_claim_million": 0,
+            "guarantee_insurance_available": True,
+            "fixed_date_ready": True,
+            "move_in_ready": True,
+            "broker_explained_rights": True,
+            "nearby_market_gap_percent": -2,
+        }
+    )
+    assert high["risk_score"] >= 70
+    assert high["risk_grade"] == "위험"
+    assert low["risk_score"] < 45
+    assert low["risk_grade"] in {"안전", "주의"}
+
