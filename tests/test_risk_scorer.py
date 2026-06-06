@@ -451,3 +451,83 @@ def test_priority_auction_text_only_inputs_are_not_missed():
     assert same_day_loan_after_movein["risk_score"] >= 76
     assert safe_registry_priority["risk_grade"] == "안전"
     assert safe_registry_priority["risk_score"] < 45
+
+
+def test_document_mismatch_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    base = {
+        "contract_type": "jeonse",
+        "property_type": "villa",
+        "region": "수도권",
+        "deposit_million": 210,
+        "estimated_market_price_million": 420,
+        "guarantee_insurance_available": True,
+        "fixed_date_ready": True,
+        "move_in_ready": True,
+        "broker_explained_rights": True,
+    }
+    land_right_unregistered = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "집합건물인데 등기부에 대지권 미등기라고 표시되어 있고 토지 지분은 나중에 정리된다고 합니다.",
+        }
+    )
+    unit_address_mismatch = scorer.score(
+        {
+            **base,
+            "user_situation_text": "등기부 주소와 건축물대장 호수가 다르고 실제 보는 방 호실도 계약서 호수와 다릅니다.",
+        }
+    )
+    free_residence_confirm = scorer.score(
+        {
+            **base,
+            "property_type": "officetel",
+            "user_situation_text": "대출 심사를 위해 무상거주확인서에 서명해 달라고 하고 실제 보증금은 따로 주면 된다고 합니다.",
+        }
+    )
+    jeonse_right_refusal = scorer.score(
+        {
+            **base,
+            "deposit_million": 260,
+            "user_situation_text": "보증금이 큰데 전세권 설정은 절대 안 된다고 하고 확정일자만 받으면 충분하다고 합니다.",
+        }
+    )
+    corporate_authority_missing = scorer.score(
+        {
+            **base,
+            "contract_type": "monthly_rent",
+            "property_type": "commercial",
+            "deposit_million": 80,
+            "monthly_rent_million": 1.2,
+            "user_situation_text": "임대인이 법인인데 법인등기부등본 사용인감계 인감증명 없이 직원 명함만 보여줍니다.",
+        }
+    )
+    mortgage_cancellation_receipt = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "근저당은 잔금으로 갚는다며 말소접수 전 영수증만 보여주고 먼저 입금하라고 합니다.",
+        }
+    )
+    safe_document_match = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "대지권 등기 완료 등기부 주소와 건축물대장 호수 일치 법인등기부등본 확인 완료 사용인감계 확인 완료 근저당 말소접수 완료 무상거주확인서 없음입니다.",
+        }
+    )
+    assert land_right_unregistered["risk_grade"] == "위험"
+    assert land_right_unregistered["risk_score"] >= 74
+    assert unit_address_mismatch["risk_grade"] == "위험"
+    assert unit_address_mismatch["risk_score"] >= 70
+    assert free_residence_confirm["risk_grade"] == "위험"
+    assert free_residence_confirm["risk_score"] >= 76
+    assert jeonse_right_refusal["risk_grade"] in {"주의", "위험"}
+    assert jeonse_right_refusal["risk_score"] >= 64
+    assert corporate_authority_missing["risk_grade"] == "위험"
+    assert corporate_authority_missing["risk_score"] >= 72
+    assert mortgage_cancellation_receipt["risk_grade"] == "위험"
+    assert mortgage_cancellation_receipt["risk_score"] >= 74
+    assert safe_document_match["risk_grade"] == "안전"
+    assert safe_document_match["risk_score"] < 45

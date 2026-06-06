@@ -104,6 +104,9 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "신탁원부 확인 완료",
         "수탁자 동의 완료",
         "보증보험 가능",
+        "근저당 말소접수 완료",
+        "대지권 등기 완료",
+        "등기부 주소와 건축물대장 호수 일치",
     ]
     has_safe_resolution = any(term in text for term in safe_resolution_terms)
     registry_risk = any(term in text for term in ["압류 있는데", "압류가", "압류 표시", "가압류", "가처분", "곧 풀린다"]) and not has_safe_resolution
@@ -163,6 +166,49 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         )
         or "대출을 먼저 실행" in text
     ) and not same_day_loan_safe
+    land_right_safe = any(term in text for term in ["대지권 등기 완료", "대지권 확인 완료", "토지 지분 확인 완료"])
+    land_right_risk = (
+        any(term in text for term in ["대지권 미등기", "대지권 없음"])
+        or ("토지 지분" in text and any(term in text for term in ["나중", "미정리", "불명", "없"]))
+    ) and not land_right_safe
+    unit_mismatch_safe = any(term in text for term in ["주소 호수 일치", "등기부 주소와 건축물대장 호수 일치", "계약서 호수 확인 완료"])
+    unit_mismatch_risk = (
+        any(term in text for term in ["호수 불일치", "주소 불일치"])
+        or (
+            any(term in text for term in ["등기부 주소", "건축물대장 호수", "실제 보는 방", "계약서 호수"])
+            and any(term in text for term in ["다르", "불일치", "맞지 않", "틀리"])
+        )
+    ) and not unit_mismatch_safe
+    free_residence_safe = any(term in text for term in ["무상거주확인서 없음", "무상거주 확인서 없음"])
+    free_residence_risk = (
+        any(term in text for term in ["무상거주확인서", "무상거주 확인서"])
+        and any(term in text for term in ["서명", "실제 보증금", "따로", "대출 심사", "작성"])
+        and not free_residence_safe
+    )
+    jeonse_right_safe = any(term in text for term in ["전세권 설정 가능", "전세권 설정 완료", "전세권 설정 협의 완료"])
+    jeonse_right_refusal_risk = (
+        "전세권 설정" in text
+        and any(term in text for term in ["거부", "절대 안", "안 된", "불가", "해줄 수 없"])
+        and not jeonse_right_safe
+    )
+    corporate_authority_safe = any(
+        term in text for term in ["법인등기부등본 확인 완료", "사용인감계 확인 완료", "인감증명 확인 완료"]
+    )
+    corporate_authority_risk = (
+        (
+            "법인" in text
+            and any(term in text for term in ["법인등기부등본", "사용인감계", "인감증명", "직원 명함"])
+            and any(term in text for term in ["없이", "미확인", "명함만", "없"])
+        )
+        or "직원 명함만" in text
+        or "법인등기부등본 사용인감계 인감증명 미확인" in text
+    ) and not corporate_authority_safe
+    mortgage_cancellation_safe = any(term in text for term in ["근저당 말소접수 완료", "말소등기 완료", "근저당 말소 완료"])
+    mortgage_cancellation_risk = (
+        "근저당" in text
+        and any(term in text for term in ["말소접수 전", "영수증만", "잔금으로 갚", "먼저 입금", "먼저 송금"])
+        and not mortgage_cancellation_safe
+    )
     return {
         "registry_text_risk": registry_risk,
         "trust_text_risk": trust_risk,
@@ -179,6 +225,12 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "auction_text_risk": auction_risk,
         "ownership_change_text_risk": ownership_change_risk,
         "same_day_loan_text_risk": same_day_loan_risk,
+        "land_right_text_risk": land_right_risk,
+        "unit_mismatch_text_risk": unit_mismatch_risk,
+        "free_residence_text_risk": free_residence_risk,
+        "jeonse_right_refusal_text_risk": jeonse_right_refusal_risk,
+        "corporate_authority_text_risk": corporate_authority_risk,
+        "mortgage_cancellation_text_risk": mortgage_cancellation_risk,
     }
 
 
@@ -228,6 +280,12 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             "경매개시결정 공매 예고" if text_flags["auction_text_risk"] else "",
             "소유자 변경 매매 전세 동시진행" if text_flags["ownership_change_text_risk"] else "",
             "잔금 당일 대출 전입 전 근저당" if text_flags["same_day_loan_text_risk"] else "",
+            "대지권 미등기 토지 지분 미정리" if text_flags["land_right_text_risk"] else "",
+            "등기부 주소 건축물대장 호수 계약서 호수 불일치" if text_flags["unit_mismatch_text_risk"] else "",
+            "무상거주확인서 실제 보증금 따로" if text_flags["free_residence_text_risk"] else "",
+            "전세권 설정 거부" if text_flags["jeonse_right_refusal_text_risk"] else "",
+            "법인등기부등본 사용인감계 인감증명 미확인" if text_flags["corporate_authority_text_risk"] else "",
+            "근저당 말소접수 전 영수증만 먼저 입금" if text_flags["mortgage_cancellation_text_risk"] else "",
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -378,6 +436,18 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(20, "계약 전후 소유자 변경 또는 매매·전세 동시진행 정황이 있습니다.", "danger", True)
     if text_flags["same_day_loan_text_risk"]:
         add(22, "잔금 당일 대출 선행 또는 전입 전 근저당 설정 위험이 있습니다.", "danger", True)
+    if text_flags["land_right_text_risk"]:
+        add(20, "대지권 미등기 또는 토지 지분 미정리로 권리관계 확인이 어렵습니다.", "danger", True)
+    if text_flags["unit_mismatch_text_risk"]:
+        add(20, "등기부·건축물대장·계약서의 주소 또는 호수가 서로 다를 가능성이 있습니다.", "danger", True)
+    if text_flags["free_residence_text_risk"]:
+        add(24, "무상거주확인서 작성과 실제 보증금 분리 정황은 허위 계약·대출 위험 신호입니다.", "danger", True)
+    if text_flags["jeonse_right_refusal_text_risk"]:
+        add(16, "전세권 설정을 과도하게 거부하는 정황이 있어 보증금 보호 수단을 재검토해야 합니다.", "warning", True)
+    if text_flags["corporate_authority_text_risk"]:
+        add(22, "법인 임대인의 권한 서류 또는 사용인감 확인이 부족합니다.", "danger", True)
+    if text_flags["mortgage_cancellation_text_risk"]:
+        add(22, "근저당 말소접수 전 영수증만 제시하고 입금을 요구하는 정황이 있습니다.", "danger", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -470,6 +540,18 @@ class RiskScorer:
             final_score = max(final_score, 72.0)
         if text_flags["same_day_loan_text_risk"]:
             final_score = max(final_score, 76.0)
+        if text_flags["land_right_text_risk"]:
+            final_score = max(final_score, 74.0)
+        if text_flags["unit_mismatch_text_risk"]:
+            final_score = max(final_score, 70.0)
+        if text_flags["free_residence_text_risk"]:
+            final_score = max(final_score, 76.0)
+        if text_flags["jeonse_right_refusal_text_risk"]:
+            final_score = max(final_score, 64.0)
+        if text_flags["corporate_authority_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["mortgage_cancellation_text_risk"]:
+            final_score = max(final_score, 74.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
         )
