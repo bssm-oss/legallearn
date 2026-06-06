@@ -1,60 +1,63 @@
 {
-  "trained_at": "2026-06-06T04:35:41.022980+00:00",
+  "trained_at": "2026-06-06T04:53:16.261222+00:00",
   "algorithm": "sklearn.ensemble.BaggingClassifier",
   "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-  "training_profile": "remote_broker_document_text_robust_offline_demo",
-  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, priority/auction text-only, document mismatch text-only, and remote/broker document text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, same-day loan-before-move-in, land-right unregistered, registry/building/contract unit mismatch, free-residence confirmation, jeonse-right refusal, corporate authority documents, mortgage cancellation-before-payment, remote owner identity, closed or unlicensed broker office, captured guarantee document, and down-contract cash-difference patterns; kept grouped validation.",
+  "training_profile": "settlement_gap_text_robust_offline_demo",
+  "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, priority/auction text-only, document mismatch text-only, remote/broker document text-only, and settlement gap text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, same-day loan-before-move-in, land-right unregistered, registry/building/contract unit mismatch, free-residence confirmation, jeonse-right refusal, corporate authority documents, mortgage cancellation-before-payment, remote owner identity, closed or unlicensed broker office, captured guarantee document, down-contract cash-difference, stale registry before closing, move-in resistance gap, loan-broker name lending, and family-account transfer patterns; kept grouped validation.",
   "random_state": 42,
   "n_estimators": 600,
   "model_path": "/Users/heodongun/Desktop/크롤링/학습/models/bagging_risk_model.joblib",
   "source_dataset": "/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv",
   "manual_scenarios": "/Users/heodongun/Desktop/크롤링/학습/데이터/manual_test_scenarios.csv",
-  "rows": 134988,
+  "rows": 136988,
   "split_strategy": "GroupShuffleSplit by source_case_number; train/validation/holdout groups are separated",
-  "train_rows": 88103,
-  "validation_rows": 19487,
-  "holdout_rows": 27398,
+  "train_rows": 89604,
+  "validation_rows": 19586,
+  "holdout_rows": 27798,
   "source_counts": {
     "case_derived": 26488,
     "synthetic_safe_reference": 18000,
     "synthetic_emerging_danger": 9000,
     "public_indicator_danger": 7200,
     "synthetic_counterfactual_danger": 6400,
-    "synthetic_counterfactual_caution": 4800,
     "synthetic_counterfactual_safe": 4800,
+    "synthetic_counterfactual_caution": 4800,
+    "synthetic_emerging_caution": 4500,
     "synthetic_user_phrase_danger": 4500,
     "synthetic_emerging_safe": 4500,
-    "synthetic_emerging_caution": 4500,
     "synthetic_colloquial_danger": 4305,
-    "synthetic_hard_caution": 3334,
     "synthetic_hard_danger": 3334,
+    "synthetic_hard_caution": 3334,
     "synthetic_payment_building_danger": 3332,
     "synthetic_hard_safe": 3332,
-    "public_indicator_safe": 2400,
     "public_indicator_caution": 2400,
+    "public_indicator_safe": 2400,
     "synthetic_user_phrase_safe": 2250,
     "synthetic_user_phrase_caution": 2250,
     "synthetic_colloquial_safe": 1848,
     "synthetic_colloquial_caution": 1847,
-    "synthetic_priority_auction_danger": 1800,
     "synthetic_document_mismatch_danger": 1800,
-    "synthetic_remote_broker_document_danger": 1500,
+    "synthetic_priority_auction_danger": 1800,
     "synthetic_tenancy_title_danger": 1500,
+    "synthetic_remote_broker_document_danger": 1500,
     "synthetic_payment_building_caution": 1334,
     "synthetic_payment_building_safe": 1334,
+    "synthetic_settlement_gap_danger": 1200,
     "synthetic_tenancy_title_caution": 750,
     "synthetic_tenancy_title_safe": 750,
-    "synthetic_priority_auction_safe": 600,
     "synthetic_document_mismatch_safe": 600,
-    "synthetic_document_mismatch_caution": 600,
+    "synthetic_priority_auction_safe": 600,
     "synthetic_priority_auction_caution": 600,
+    "synthetic_document_mismatch_caution": 600,
     "synthetic_remote_broker_document_safe": 500,
-    "synthetic_remote_broker_document_caution": 500
+    "synthetic_remote_broker_document_caution": 500,
+    "synthetic_settlement_gap_caution": 400,
+    "synthetic_settlement_gap_safe": 400
   },
   "label_counts": {
-    "안전": 41362,
-    "주의": 39043,
-    "위험": 54583
+    "안전": 41762,
+    "주의": 39443,
+    "위험": 55783
   },
   "features": [
     "deposit_million",
@@ -150,56 +153,56 @@
     "2": "위험"
   },
   "validation_metrics": {
-    "accuracy": 0.9959,
-    "balanced_accuracy": 0.9962,
-    "macro_f1": 0.9958,
-    "weighted_f1": 0.9959,
-    "macro_precision": 0.9955,
-    "macro_recall": 0.9962,
-    "rows": 19487,
+    "accuracy": 0.9917,
+    "balanced_accuracy": 0.9911,
+    "macro_f1": 0.9918,
+    "weighted_f1": 0.9917,
+    "macro_precision": 0.9925,
+    "macro_recall": 0.9911,
+    "rows": 19586,
     "confusion_matrix": [
       [
-        5890,
-        28,
+        5884,
+        0,
         0
       ],
       [
-        0,
-        5788,
-        3
+        28,
+        5791,
+        116
       ],
       [
         0,
-        49,
-        7729
+        18,
+        7749
       ]
     ]
   },
   "metrics": {
-    "accuracy": 0.9841,
-    "balanced_accuracy": 0.9829,
-    "macro_f1": 0.983,
-    "weighted_f1": 0.9841,
-    "macro_precision": 0.9835,
-    "macro_recall": 0.9829,
-    "rows": 27398,
+    "accuracy": 0.9829,
+    "balanced_accuracy": 0.9814,
+    "macro_f1": 0.9819,
+    "weighted_f1": 0.983,
+    "macro_precision": 0.9826,
+    "macro_recall": 0.9814,
+    "rows": 27798,
     "confusion_matrix": [
       [
-        8092,
-        280,
+        8144,
+        252,
         0
       ],
       [
         0,
-        7858,
-        112
+        7799,
+        170
       ],
       [
         0,
-        43,
-        11013
+        52,
+        11381
       ]
     ],
-    "test_rows": 27398
+    "test_rows": 27798
   }
 }

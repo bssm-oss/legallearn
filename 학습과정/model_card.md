@@ -6,8 +6,8 @@
 - 알고리즘: `sklearn.ensemble.BaggingClassifier`
 - 기본 추정기: `sklearn.tree.DecisionTreeClassifier`
 - 학습 데이터: `/Users/heodongun/Desktop/크롤링/학습/데이터/derived_contract_cases.csv`
-- 전체 행 수: 134988
-- 학습/검증/홀드아웃: 88103 / 19487 / 27398
+- 전체 행 수: 136988
+- 학습/검증/홀드아웃: 89604 / 19586 / 27798
 
 ## 입력과 출력
 
@@ -17,24 +17,24 @@
 
 ## 추가학습 구성
 
-- 학습 프로필: `remote_broker_document_text_robust_offline_demo`
-- 보강 전략: Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, priority/auction text-only, document mismatch text-only, and remote/broker document text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, same-day loan-before-move-in, land-right unregistered, registry/building/contract unit mismatch, free-residence confirmation, jeonse-right refusal, corporate authority documents, mortgage cancellation-before-payment, remote owner identity, closed or unlicensed broker office, captured guarantee document, and down-contract cash-difference patterns; kept grouped validation.
+- 학습 프로필: `settlement_gap_text_robust_offline_demo`
+- 보강 전략: Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, priority/auction text-only, document mismatch text-only, remote/broker document text-only, and settlement gap text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, same-day loan-before-move-in, land-right unregistered, registry/building/contract unit mismatch, free-residence confirmation, jeonse-right refusal, corporate authority documents, mortgage cancellation-before-payment, remote owner identity, closed or unlicensed broker office, captured guarantee document, down-contract cash-difference, stale registry before closing, move-in resistance gap, loan-broker name lending, and family-account transfer patterns; kept grouped validation.
 
 ## 평가 결과
 
 Validation:
 
-- Accuracy: 0.9959
-- Balanced Accuracy: 0.9962
-- Macro F1: 0.9958
-- Rows: 19487
+- Accuracy: 0.9917
+- Balanced Accuracy: 0.9911
+- Macro F1: 0.9918
+- Rows: 19586
 
 Holdout:
 
-- Accuracy: 0.9841
-- Balanced Accuracy: 0.9829
-- Macro F1: 0.983
-- Rows: 27398
+- Accuracy: 0.9829
+- Balanced Accuracy: 0.9814
+- Macro F1: 0.9819
+- Rows: 27798
 
 ## 사용 범위
 

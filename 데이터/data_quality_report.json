@@ -1,5 +1,5 @@
 {
-  "rows": 134988,
+  "rows": 136988,
   "columns": 46,
   "source_counts": {
     "case_derived": 26488,
@@ -7,52 +7,55 @@
     "synthetic_emerging_danger": 9000,
     "public_indicator_danger": 7200,
     "synthetic_counterfactual_danger": 6400,
-    "synthetic_counterfactual_caution": 4800,
     "synthetic_counterfactual_safe": 4800,
+    "synthetic_counterfactual_caution": 4800,
+    "synthetic_emerging_caution": 4500,
     "synthetic_user_phrase_danger": 4500,
     "synthetic_emerging_safe": 4500,
-    "synthetic_emerging_caution": 4500,
     "synthetic_colloquial_danger": 4305,
-    "synthetic_hard_caution": 3334,
     "synthetic_hard_danger": 3334,
+    "synthetic_hard_caution": 3334,
     "synthetic_payment_building_danger": 3332,
     "synthetic_hard_safe": 3332,
-    "public_indicator_safe": 2400,
     "public_indicator_caution": 2400,
+    "public_indicator_safe": 2400,
     "synthetic_user_phrase_safe": 2250,
     "synthetic_user_phrase_caution": 2250,
     "synthetic_colloquial_safe": 1848,
     "synthetic_colloquial_caution": 1847,
-    "synthetic_priority_auction_danger": 1800,
     "synthetic_document_mismatch_danger": 1800,
-    "synthetic_remote_broker_document_danger": 1500,
+    "synthetic_priority_auction_danger": 1800,
     "synthetic_tenancy_title_danger": 1500,
+    "synthetic_remote_broker_document_danger": 1500,
     "synthetic_payment_building_caution": 1334,
     "synthetic_payment_building_safe": 1334,
+    "synthetic_settlement_gap_danger": 1200,
     "synthetic_tenancy_title_caution": 750,
     "synthetic_tenancy_title_safe": 750,
-    "synthetic_priority_auction_safe": 600,
     "synthetic_document_mismatch_safe": 600,
-    "synthetic_document_mismatch_caution": 600,
+    "synthetic_priority_auction_safe": 600,
     "synthetic_priority_auction_caution": 600,
+    "synthetic_document_mismatch_caution": 600,
     "synthetic_remote_broker_document_safe": 500,
-    "synthetic_remote_broker_document_caution": 500
+    "synthetic_remote_broker_document_caution": 500,
+    "synthetic_settlement_gap_caution": 400,
+    "synthetic_settlement_gap_safe": 400
   },
   "label_counts": {
-    "0": 41362,
-    "1": 39043,
-    "2": 54583
+    "0": 41762,
+    "1": 39443,
+    "2": 55783
   },
   "contract_type_counts": {
-    "jeonse": 78757,
+    "jeonse": 80357,
     "sale": 28431,
-    "monthly_rent": 27800
+    "monthly_rent": 28200
   },
   "property_type_counts": {
-    "apartment": 41893,
-    "villa": 39535,
-    "officetel": 25371,
-    "multi_family": 24395,
+    "apartment": 42293,
+    "villa": 40535,
+    "officetel": 25771,
+    "multi_family": 24595,
     "commercial": 3794
   },
   "missing_by_column": {
@@ -106,21 +109,21 @@
   "duplicate_rows": 0,
   "jeonse_ratio_quantiles": {
     "0.0": 0.0355,
-    "0.25": 0.1441,
-    "0.5": 0.4822,
-    "0.75": 0.7055,
-    "0.9": 0.8359,
-    "0.99": 1.0652,
+    "0.25": 0.1455,
+    "0.5": 0.4823,
+    "0.75": 0.7019,
+    "0.9": 0.8345,
+    "0.99": 1.0644,
     "1.0": 1.1799
   },
   "debt_ratio_quantiles": {
     "0.0": 0.0522,
-    "0.25": 0.3903,
-    "0.5": 0.6445,
-    "0.75": 0.9095,
-    "0.9": 1.139,
-    "0.99": 1.6954,
+    "0.25": 0.3916,
+    "0.5": 0.6417,
+    "0.75": 0.9056,
+    "0.9": 1.1355,
+    "0.99": 1.6926,
     "1.0": 2.101
   },
-  "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시, 사용자 자연어 입력 변형 예시, 구어체 텍스트-only 입력 예시, 계좌·계약금·건축물 텍스트-only 예시, 전대차·임차권등기·미등기·가계약금 텍스트-only 예시, 전입세대·선순위·경매공매·소유자변경 텍스트-only 예시, 대지권·주소호수·무상거주확인서·법인권한·말소접수 텍스트-only 예시, 비대면 신원·중개사 자격·보증서 캡처·다운계약 텍스트-only 예시를 결합했다. 실제 피해자 원천 기록은 아니다."
+  "note": "서비스형 학습 절차를 흉내 내기 위해 판례 기반 다중 변형, 안전 기준 예시, 경계/스트레스 예시, 공식 공개자료 기반 위험 지표 예시, 추가 반례 예시, 신원/대항력/체납/이중계약 현장패턴 예시, 사용자 자연어 입력 변형 예시, 구어체 텍스트-only 입력 예시, 계좌·계약금·건축물 텍스트-only 예시, 전대차·임차권등기·미등기·가계약금 텍스트-only 예시, 전입세대·선순위·경매공매·소유자변경 텍스트-only 예시, 대지권·주소호수·무상거주확인서·법인권한·말소접수 텍스트-only 예시, 비대면 신원·중개사 자격·보증서 캡처·다운계약 텍스트-only 예시, 잔금 최신서류·전입공백·대출브로커·가족계좌 텍스트-only 예시를 결합했다. 실제 피해자 원천 기록은 아니다."
 }
