@@ -255,7 +255,7 @@ def write_training_report(
 - 학습 행 수: {metadata['train_rows']}
 - 검증 행 수: {metadata['validation_rows']}
 - 홀드아웃 테스트 행 수: {metadata['holdout_rows']}
-- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시 + 사용자 자연어 입력 변형 예시 + 구어체 텍스트-only 입력 예시 + 계좌·계약금·건축물 텍스트-only 예시 + 전대차·임차권등기·미등기·가계약금 텍스트-only 예시 + 전입세대·선순위·경매공매·소유자변경 텍스트-only 예시 + 대지권·주소호수·무상거주확인서·법인권한·말소접수 텍스트-only 예시
+- 파생 방식: 판례 1건당 여러 계약 조건 변형 + 정상 계약 기준 예시 + 위험 경계/스트레스 예시 + 추가 반례 예시 + 신원/대항력/체납/이중계약 현장패턴 예시 + 사용자 자연어 입력 변형 예시 + 구어체 텍스트-only 입력 예시 + 계좌·계약금·건축물 텍스트-only 예시 + 전대차·임차권등기·미등기·가계약금 텍스트-only 예시 + 전입세대·선순위·경매공매·소유자변경 텍스트-only 예시 + 대지권·주소호수·무상거주확인서·법인권한·말소접수 텍스트-only 예시 + 비대면 신원·중개사 자격·보증서 캡처·다운계약 텍스트-only 예시
 - 누수 방지: 같은 `source_case_number` 그룹이 학습/검증/홀드아웃에 동시에 들어가지 않도록 분리
 
 데이터 소스 분포:
@@ -448,8 +448,8 @@ def train_model(
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "algorithm": "sklearn.ensemble.BaggingClassifier",
         "base_estimator": "sklearn.tree.DecisionTreeClassifier",
-        "training_profile": "document_mismatch_text_robust_offline_demo",
-        "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, priority/auction text-only, and document mismatch text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, same-day loan-before-move-in, land-right unregistered, registry/building/contract unit mismatch, free-residence confirmation, jeonse-right refusal, corporate authority documents, and mortgage cancellation-before-payment patterns; kept grouped validation.",
+        "training_profile": "remote_broker_document_text_robust_offline_demo",
+        "additional_training_strategy": "Added counterfactual, emerging field-pattern, natural-language user phrase, colloquial text-only, payment/building text-only, tenancy/title text-only, priority/auction text-only, document mismatch text-only, and remote/broker document text-only examples; introduced explicit safety and critical-risk text signals for verified proxy contracts, protection requirements, clean registry cases, trust, seizure, delayed move-in, tax arrears, double-contract, no-guarantee, account mismatch, illegal building, pressure-to-pay, unauthorized sublease, lease-registration, unregistered or pre-approval new building, non-refundable reservation deposit, tenant-registry disclosure refusal, senior tenant deposit unknown, auction or public-auction notices, ownership transfer during contract, same-day loan-before-move-in, land-right unregistered, registry/building/contract unit mismatch, free-residence confirmation, jeonse-right refusal, corporate authority documents, mortgage cancellation-before-payment, remote owner identity, closed or unlicensed broker office, captured guarantee document, and down-contract cash-difference patterns; kept grouped validation.",
         "random_state": random_state,
         "n_estimators": n_estimators,
         "model_path": str(MODEL_PATH),

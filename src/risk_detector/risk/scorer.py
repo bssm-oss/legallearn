@@ -86,7 +86,7 @@ def infer_legal_category(contract: ContractInput) -> str:
         return "criminal_fraud"
     if any(term in combined for term in ["강박", "협박", "속였다", "허위"]):
         return "civil_fraud_duress"
-    if any(term in combined for term in ["중개보조", "공인중개", "광고", "무등록"]):
+    if any(term in combined for term in ["중개보조", "공인중개", "광고", "무등록", "폐업", "공제증서", "자격번호"]):
         return "realtor_prohibited_acts"
     if contract.contract_type == "sale":
         return "civil_sale_effect"
@@ -107,6 +107,12 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "근저당 말소접수 완료",
         "대지권 등기 완료",
         "등기부 주소와 건축물대장 호수 일치",
+        "영상통화 본인 확인",
+        "신분증 원본 대조",
+        "중개사 등록 확인 완료",
+        "공제증서 확인 완료",
+        "보증기관 조회 완료",
+        "계약서 실제 보증금 일치",
     ]
     has_safe_resolution = any(term in text for term in safe_resolution_terms)
     registry_risk = any(term in text for term in ["압류 있는데", "압류가", "압류 표시", "가압류", "가처분", "곧 풀린다"]) and not has_safe_resolution
@@ -209,6 +215,30 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         and any(term in text for term in ["말소접수 전", "영수증만", "잔금으로 갚", "먼저 입금", "먼저 송금"])
         and not mortgage_cancellation_safe
     )
+    remote_identity_safe = any(
+        term in text for term in ["영상통화 본인 확인", "신분증 원본 대조", "위임장 원본", "인감증명 원본", "본인 확인 완료"]
+    )
+    remote_identity_risk = (
+        any(term in text for term in ["해외 체류", "비대면", "대리인", "대리인이 계약"])
+        and any(term in text for term in ["신분증 사진만", "영상통화 거부", "원본 못", "사진만", "카톡으로만"])
+        and not remote_identity_safe
+    )
+    broker_license_safe = any(term in text for term in ["중개사 등록 확인 완료", "공제증서 확인 완료", "등록증 확인 완료", "공제증서 원본 확인"])
+    broker_license_risk = (
+        any(term in text for term in ["폐업 상태", "폐업", "등록증 조회 안됨", "공제증서 나중", "공제증서 만료", "자격번호 없음", "등록번호 없음", "무자격"])
+        and not broker_license_safe
+    )
+    guarantee_document_safe = any(term in text for term in ["보증기관 조회 완료", "보증서 원본 확인", "HUG 조회 완료", "보증보험 가능"])
+    guarantee_document_risk = (
+        any(term in text for term in ["보증서 캡처", "PDF 캡처", "HUG 보증서", "보증서가 이미 발급", "보증기관 조회"])
+        and any(term in text for term in ["하지 말", "하지말", "캡처만", "조회는", "확인하지 말"])
+        and not guarantee_document_safe
+    )
+    down_contract_safe = any(term in text for term in ["계약서 실제 보증금 일치", "차액 현금 없음", "실제 지급액 일치"])
+    down_contract_risk = (
+        any(term in text for term in ["다운계약", "보증금을 낮게", "계약서에는 보증금을 낮게", "차액은 현금", "실제 보증금 차액", "세금이 줄어"])
+        and not down_contract_safe
+    )
     return {
         "registry_text_risk": registry_risk,
         "trust_text_risk": trust_risk,
@@ -231,6 +261,10 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "jeonse_right_refusal_text_risk": jeonse_right_refusal_risk,
         "corporate_authority_text_risk": corporate_authority_risk,
         "mortgage_cancellation_text_risk": mortgage_cancellation_risk,
+        "remote_identity_text_risk": remote_identity_risk,
+        "broker_license_text_risk": broker_license_risk,
+        "guarantee_document_text_risk": guarantee_document_risk,
+        "down_contract_text_risk": down_contract_risk,
     }
 
 
@@ -286,6 +320,10 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             "전세권 설정 거부" if text_flags["jeonse_right_refusal_text_risk"] else "",
             "법인등기부등본 사용인감계 인감증명 미확인" if text_flags["corporate_authority_text_risk"] else "",
             "근저당 말소접수 전 영수증만 먼저 입금" if text_flags["mortgage_cancellation_text_risk"] else "",
+            "비대면 계약 신분증 사진만 영상통화 거부" if text_flags["remote_identity_text_risk"] else "",
+            "폐업 중개사무소 공제증서 나중 자격번호 없음" if text_flags["broker_license_text_risk"] else "",
+            "HUG 보증서 PDF 캡처 보증기관 조회 거부" if text_flags["guarantee_document_text_risk"] else "",
+            "다운계약 보증금 낮게 차액 현금" if text_flags["down_contract_text_risk"] else "",
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -448,6 +486,14 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(22, "법인 임대인의 권한 서류 또는 사용인감 확인이 부족합니다.", "danger", True)
     if text_flags["mortgage_cancellation_text_risk"]:
         add(22, "근저당 말소접수 전 영수증만 제시하고 입금을 요구하는 정황이 있습니다.", "danger", True)
+    if text_flags["remote_identity_text_risk"]:
+        add(22, "비대면 임대인 또는 대리계약에서 신분증 원본·영상통화 확인이 부족합니다.", "danger", True)
+    if text_flags["broker_license_text_risk"]:
+        add(20, "중개사무소 폐업, 자격번호 누락, 공제증서 미확인 등 중개 자격 위험이 있습니다.", "danger", True)
+    if text_flags["guarantee_document_text_risk"]:
+        add(20, "보증서 캡처만 제시하고 보증기관 조회를 막는 정황이 있습니다.", "danger", True)
+    if text_flags["down_contract_text_risk"]:
+        add(24, "계약서 금액과 실제 보증금 차액을 분리하는 다운계약·허위계약 위험이 있습니다.", "danger", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -552,6 +598,14 @@ class RiskScorer:
             final_score = max(final_score, 72.0)
         if text_flags["mortgage_cancellation_text_risk"]:
             final_score = max(final_score, 74.0)
+        if text_flags["remote_identity_text_risk"]:
+            final_score = max(final_score, 74.0)
+        if text_flags["broker_license_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["guarantee_document_text_risk"]:
+            final_score = max(final_score, 72.0)
+        if text_flags["down_contract_text_risk"]:
+            final_score = max(final_score, 76.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
         )

@@ -27,6 +27,7 @@ def test_build_derived_contract_dataset_has_required_columns():
         tenancy_title_examples=36,
         priority_auction_examples=40,
         document_mismatch_examples=40,
+        remote_broker_document_examples=40,
     )
     assert len(df) >= 900
     for column in MODEL_FEATURES + [TARGET_COLUMN]:
@@ -66,6 +67,9 @@ def test_build_derived_contract_dataset_has_required_columns():
             "synthetic_document_mismatch_safe",
             "synthetic_document_mismatch_caution",
             "synthetic_document_mismatch_danger",
+            "synthetic_remote_broker_document_safe",
+            "synthetic_remote_broker_document_caution",
+            "synthetic_remote_broker_document_danger",
         ]
     ).all()
     assert df["source"].str.startswith("synthetic_counterfactual").any()
@@ -76,5 +80,6 @@ def test_build_derived_contract_dataset_has_required_columns():
     assert df["source"].str.startswith("synthetic_tenancy_title").any()
     assert df["source"].str.startswith("synthetic_priority_auction").any()
     assert df["source"].str.startswith("synthetic_document_mismatch").any()
+    assert df["source"].str.startswith("synthetic_remote_broker_document").any()
     assert df["safety_term_count"].max() > 0
     assert df["critical_term_count"].max() > 0

@@ -531,3 +531,62 @@ def test_document_mismatch_text_only_inputs_are_not_missed():
     assert mortgage_cancellation_receipt["risk_score"] >= 74
     assert safe_document_match["risk_grade"] == "안전"
     assert safe_document_match["risk_score"] < 45
+
+
+def test_remote_broker_document_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    base = {
+        "contract_type": "jeonse",
+        "property_type": "villa",
+        "region": "수도권",
+        "deposit_million": 210,
+        "estimated_market_price_million": 420,
+        "guarantee_insurance_available": True,
+        "fixed_date_ready": True,
+        "move_in_ready": True,
+        "broker_explained_rights": True,
+    }
+    remote_owner_id_photo_only = scorer.score(
+        {
+            **base,
+            "user_situation_text": "임대인이 해외 체류 중이라며 신분증 사진만 보내고 영상통화는 거부하며 대리인이 계약하자고 합니다.",
+        }
+    )
+    broker_closed_office = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "중개사무소 등록증을 찾아보니 폐업 상태인데 명함만 주고 공제증서는 나중에 준다고 합니다.",
+        }
+    )
+    fake_hug_guarantee = scorer.score(
+        {
+            **base,
+            "property_type": "officetel",
+            "user_situation_text": "중개사가 HUG 보증서가 이미 발급됐다고 PDF 캡처만 보여주고 보증기관 조회는 하지 말라고 합니다.",
+        }
+    )
+    down_contract_cashback = scorer.score(
+        {
+            **base,
+            "user_situation_text": "계약서에는 보증금을 낮게 쓰고 실제 보증금 차액은 현금으로 따로 주면 세금이 줄어든다고 합니다.",
+        }
+    )
+    safe_remote_verified = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "deposit_million": 150,
+            "user_situation_text": "임대인이 해외 체류 중이지만 영상통화 본인 확인 신분증 원본 대조 위임장 원본 인감증명 원본 공제증서 확인 완료입니다.",
+        }
+    )
+    assert remote_owner_id_photo_only["risk_grade"] == "위험"
+    assert remote_owner_id_photo_only["risk_score"] >= 74
+    assert broker_closed_office["risk_grade"] == "위험"
+    assert broker_closed_office["risk_score"] >= 72
+    assert fake_hug_guarantee["risk_grade"] == "위험"
+    assert fake_hug_guarantee["risk_score"] >= 72
+    assert down_contract_cashback["risk_grade"] == "위험"
+    assert down_contract_cashback["risk_score"] >= 76
+    assert safe_remote_verified["risk_grade"] == "안전"
+    assert safe_remote_verified["risk_score"] < 45

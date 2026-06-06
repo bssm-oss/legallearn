@@ -41,3 +41,8 @@ REALISTIC_039,무상거주확인서 서명 요구,76.0,jeonse,officetel,수도�
 REALISTIC_040,전세권 설정 거부,64.0,jeonse,villa,수도권,260,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,보증금이 큰데 전세권 설정은 절대 안 된다고 하고 확정일자만 받으면 충분하다고 합니다.,
 REALISTIC_041,법인 임대인 권한서류 미확인,72.0,monthly_rent,commercial,수도권,80,1.2,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인이 법인인데 법인등기부등본 사용인감계 인감증명 없이 직원 명함만 보여줍니다.,
 REALISTIC_042,근저당 말소접수 전 영수증만 제시,74.0,jeonse,apartment,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,근저당은 잔금으로 갚는다며 말소접수 전 영수증만 보여주고 먼저 입금하라고 합니다.,
+REALISTIC_043,비대면 임대인 신분증 사진만 제시,74.0,jeonse,villa,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인이 해외 체류 중이라며 신분증 사진만 보내고 영상통화는 거부하며 대리인이 계약하자고 합니다.,
+REALISTIC_044,폐업 중개사무소 공제증서 미제공,72.0,jeonse,apartment,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,중개사무소 등록증을 찾아보니 폐업 상태인데 명함만 주고 공제증서는 나중에 준다고 합니다.,
+REALISTIC_045,보증서 캡처만 제시하고 조회 거부,72.0,jeonse,officetel,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,중개사가 HUG 보증서가 이미 발급됐다고 PDF 캡처만 보여주고 보증기관 조회는 하지 말라고 합니다.,
+REALISTIC_046,다운계약 차액 현금 요구,76.0,jeonse,villa,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,계약서에는 보증금을 낮게 쓰고 실제 보증금 차액은 현금으로 따로 주면 세금이 줄어든다고 합니다.,
+REALISTIC_047,안전한 비대면 대리계약 서류 확인,,jeonse,apartment,수도권,150,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인이 해외 체류 중이지만 영상통화 본인 확인 신분증 원본 대조 위임장 원본 인감증명 원본 공제증서 확인 완료입니다.,45.0
