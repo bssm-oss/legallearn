@@ -590,3 +590,71 @@ def test_remote_broker_document_text_only_inputs_are_not_missed():
     assert down_contract_cashback["risk_score"] >= 76
     assert safe_remote_verified["risk_grade"] == "안전"
     assert safe_remote_verified["risk_score"] < 45
+
+
+def test_settlement_gap_text_only_inputs_are_not_missed():
+    scorer = RiskScorer()
+    base = {
+        "contract_type": "jeonse",
+        "property_type": "villa",
+        "region": "수도권",
+        "deposit_million": 210,
+        "estimated_market_price_million": 420,
+        "guarantee_insurance_available": True,
+        "fixed_date_ready": True,
+        "move_in_ready": True,
+        "broker_explained_rights": True,
+    }
+    stale_registry_refusal = scorer.score(
+        {
+            **base,
+            "user_situation_text": "등기부등본은 한 달 전에 발급한 것만 보여주고 잔금 당일 재열람은 필요 없다며 거부합니다.",
+        }
+    )
+    friday_movein_gap = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "user_situation_text": "금요일 잔금을 치르지만 전입신고는 월요일에 하라고 해서 주말 동안 대항력 공백이 생깁니다.",
+        }
+    )
+    loan_broker_name_lending = scorer.score(
+        {
+            **base,
+            "user_situation_text": "전세대출 브로커가 실제 거주하지 않아도 명의만 빌려주면 수수료를 준다고 합니다.",
+        }
+    )
+    family_account_transfer = scorer.score(
+        {
+            **base,
+            "property_type": "multi_family",
+            "user_situation_text": "임대인 본인 계좌가 막혀 있어서 배우자 계좌로 보증금을 보내라고 합니다.",
+        }
+    )
+    renovation_no_movein = scorer.score(
+        {
+            **base,
+            "property_type": "officetel",
+            "user_situation_text": "인테리어 공사가 끝나야 입주할 수 있다며 잔금 후 열흘 뒤 전입신고를 하라고 합니다.",
+        }
+    )
+    safe_latest_registry_movein = scorer.score(
+        {
+            **base,
+            "property_type": "apartment",
+            "deposit_million": 150,
+            "user_situation_text": "잔금 당일 등기부 재열람 완료 전입신고 즉시 가능 임대인 본인 계좌 일치 전세대출 브로커 없음입니다.",
+        }
+    )
+    assert stale_registry_refusal["risk_grade"] in {"주의", "위험"}
+    assert stale_registry_refusal["risk_score"] >= 66
+    assert friday_movein_gap["risk_grade"] == "위험"
+    assert friday_movein_gap["risk_score"] >= 74
+    assert loan_broker_name_lending["risk_grade"] == "위험"
+    assert loan_broker_name_lending["risk_score"] >= 76
+    assert family_account_transfer["risk_grade"] == "위험"
+    assert family_account_transfer["risk_score"] >= 74
+    assert renovation_no_movein["risk_grade"] == "위험"
+    assert renovation_no_movein["risk_score"] >= 74
+    assert safe_latest_registry_movein["risk_grade"] == "안전"
+    assert safe_latest_registry_movein["risk_score"] < 45

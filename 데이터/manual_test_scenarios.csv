@@ -46,3 +46,9 @@ REALISTIC_044,폐업 중개사무소 공제증서 미제공,72.0,jeonse,apartmen
 REALISTIC_045,보증서 캡처만 제시하고 조회 거부,72.0,jeonse,officetel,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,중개사가 HUG 보증서가 이미 발급됐다고 PDF 캡처만 보여주고 보증기관 조회는 하지 말라고 합니다.,
 REALISTIC_046,다운계약 차액 현금 요구,76.0,jeonse,villa,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,계약서에는 보증금을 낮게 쓰고 실제 보증금 차액은 현금으로 따로 주면 세금이 줄어든다고 합니다.,
 REALISTIC_047,안전한 비대면 대리계약 서류 확인,,jeonse,apartment,수도권,150,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인이 해외 체류 중이지만 영상통화 본인 확인 신분증 원본 대조 위임장 원본 인감증명 원본 공제증서 확인 완료입니다.,45.0
+REALISTIC_048,잔금 당일 최신 등기부 재열람 거부,66.0,jeonse,villa,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,등기부등본은 한 달 전에 발급한 것만 보여주고 잔금 당일 재열람은 필요 없다며 거부합니다.,
+REALISTIC_049,금요일 잔금 후 월요일 전입 요구,74.0,jeonse,apartment,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,금요일 잔금을 치르지만 전입신고는 월요일에 하라고 해서 주말 동안 대항력 공백이 생깁니다.,
+REALISTIC_050,전세대출 브로커 명의대여 제안,76.0,jeonse,villa,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,전세대출 브로커가 실제 거주하지 않아도 명의만 빌려주면 수수료를 준다고 합니다.,
+REALISTIC_051,임대인 가족 계좌 송금 요구,74.0,jeonse,multi_family,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,임대인 본인 계좌가 막혀 있어서 배우자 계좌로 보증금을 보내라고 합니다.,
+REALISTIC_052,잔금 후 공사 완료 뒤 전입 요구,74.0,jeonse,officetel,수도권,210,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,인테리어 공사가 끝나야 입주할 수 있다며 잔금 후 열흘 뒤 전입신고를 하라고 합니다.,
+REALISTIC_053,안전한 최신 등기부·전입·대출 확인,,jeonse,apartment,수도권,150,0.0,0,420,0,0,False,False,False,False,False,False,False,False,False,True,True,True,True,0,24,,잔금 당일 등기부 재열람 완료 전입신고 즉시 가능 임대인 본인 계좌 일치 전세대출 브로커 없음입니다.,45.0

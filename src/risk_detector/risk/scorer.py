@@ -113,6 +113,11 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "공제증서 확인 완료",
         "보증기관 조회 완료",
         "계약서 실제 보증금 일치",
+        "잔금 당일 등기부 재열람 완료",
+        "최신 등기부 확인 완료",
+        "전입신고 즉시 가능",
+        "임대인 본인 계좌 일치",
+        "전세대출 브로커 없음",
     ]
     has_safe_resolution = any(term in text for term in safe_resolution_terms)
     registry_risk = any(term in text for term in ["압류 있는데", "압류가", "압류 표시", "가압류", "가처분", "곧 풀린다"]) and not has_safe_resolution
@@ -122,8 +127,20 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
     no_guarantee_risk = any(term in text for term in ["보증보험 불가", "보증보험 안", "보증보험 안됨", "보증보험 가입이 안", "보증보험 어렵"])
     account_risk = any(
         term in text
-        for term in ["계좌 명의", "다른 사람 계좌", "임대인 이름이 아닙", "대표 개인계좌", "개인계좌로 보내", "현금 요구"]
-    ) and not any(term in text for term in ["임대인 계좌 일치", "소유자 계좌 확인", "계좌 확인 완료"])
+        for term in [
+            "계좌 명의",
+            "다른 사람 계좌",
+            "임대인 이름이 아닙",
+            "대표 개인계좌",
+            "개인계좌로 보내",
+            "현금 요구",
+            "배우자 계좌",
+            "가족 계좌",
+            "아들 계좌",
+            "부모 계좌",
+            "계좌가 막혀",
+        ]
+    ) and not any(term in text for term in ["임대인 계좌 일치", "소유자 계좌 확인", "계좌 확인 완료", "임대인 본인 계좌 일치", "가족 계좌 송금 없음"])
     building_safe = any(term in text for term in ["건축물대장 확인 완료", "건축물대장 정상", "위반건축물 아님", "불법증축 아님", "무허가 아님"])
     illegal_building_risk = any(term in text for term in ["불법증축", "쪼개기", "무허가", "용도위반", "건축물대장 못", "위반건축물"]) and not building_safe
     pressure_risk = any(term in text for term in ["계약금 먼저", "오늘 계약금", "빨리 입금", "등기부는 나중", "서류는 나중"]) and not any(
@@ -164,11 +181,19 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
     ownership_change_risk = any(
         term in text for term in ["소유자가 바뀔", "소유자 변경", "매매와 전세를 동시에", "전세를 동시에", "동시진행", "갭투자 승계"]
     ) and not ownership_safe
-    same_day_loan_safe = any(term in text for term in ["잔금 당일 대출 없음", "전입 후 대출 금지 특약", "당일 근저당 없음"])
+    same_day_loan_safe = any(
+        term in text
+        for term in [
+            "잔금 당일 대출 없음",
+            "전입 후 대출 금지 특약",
+            "당일 근저당 없음",
+            "전세대출 브로커 없음",
+        ]
+    )
     same_day_loan_risk = (
         (
             any(term in text for term in ["잔금 당일", "전입신고 전에", "전입 전에"])
-            and any(term in text for term in ["대출", "근저당"])
+            and any(term in text for term in ["담보대출", "근저당", "대출 실행", "대출을 먼저", "대출 먼저"])
         )
         or "대출을 먼저 실행" in text
     ) and not same_day_loan_safe
@@ -239,6 +264,25 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         any(term in text for term in ["다운계약", "보증금을 낮게", "계약서에는 보증금을 낮게", "차액은 현금", "실제 보증금 차액", "세금이 줄어"])
         and not down_contract_safe
     )
+    latest_registry_safe = any(term in text for term in ["잔금 당일 등기부 재열람 완료", "최신 등기부 확인 완료", "등기부 당일 확인 완료"])
+    stale_registry_risk = (
+        any(term in text for term in ["등기부", "등기부등본"])
+        and any(term in text for term in ["한 달 전", "오래된", "발급한 것만", "며칠 전", "예전 등기부"])
+        and any(term in text for term in ["재열람 거부", "재열람은 필요 없다", "재열람 필요 없다", "거부"])
+        and not latest_registry_safe
+    )
+    movein_gap_safe = any(term in text for term in ["전입신고 즉시 가능", "전입 바로 가능", "당일 전입 완료", "대항력 공백 없음"])
+    movein_gap_risk = (
+        any(term in text for term in ["전입신고", "전입", "입주"])
+        and any(term in text for term in ["월요일", "주말 동안", "잔금 후", "열흘 뒤", "한 달 뒤", "입주할 수 없다", "입주는"])
+        and any(term in text for term in ["대항력 공백", "하라고", "뒤 가능", "그때"])
+        and not movein_gap_safe
+    )
+    loan_broker_safe = any(term in text for term in ["전세대출 브로커 없음", "실제 거주 확인 완료", "명의대여 없음", "대출 브로커 없음"])
+    loan_broker_risk = (
+        any(term in text for term in ["전세대출 브로커", "대출 브로커", "명의만 빌려", "명의만 빌리", "실제 거주하지", "수수료를 준"])
+        and not loan_broker_safe
+    )
     return {
         "registry_text_risk": registry_risk,
         "trust_text_risk": trust_risk,
@@ -265,6 +309,9 @@ def _text_risk_flags(text: str) -> dict[str, bool]:
         "broker_license_text_risk": broker_license_risk,
         "guarantee_document_text_risk": guarantee_document_risk,
         "down_contract_text_risk": down_contract_risk,
+        "stale_registry_text_risk": stale_registry_risk,
+        "movein_gap_text_risk": movein_gap_risk,
+        "loan_broker_text_risk": loan_broker_risk,
     }
 
 
@@ -324,6 +371,9 @@ def contract_to_model_row(contract: ContractInput) -> dict[str, Any]:
             "폐업 중개사무소 공제증서 나중 자격번호 없음" if text_flags["broker_license_text_risk"] else "",
             "HUG 보증서 PDF 캡처 보증기관 조회 거부" if text_flags["guarantee_document_text_risk"] else "",
             "다운계약 보증금 낮게 차액 현금" if text_flags["down_contract_text_risk"] else "",
+            "오래된 등기부 잔금 당일 재열람 거부" if text_flags["stale_registry_text_risk"] else "",
+            "전입신고 지연 주말 대항력 공백" if text_flags["movein_gap_text_risk"] else "",
+            "전세대출 브로커 명의대여 실제 거주 없음" if text_flags["loan_broker_text_risk"] else "",
             "고전세가율" if contract.contract_type != "sale" and jeonse_ratio >= 0.85 else "",
             "높은 부채비율 선순위채권 위험" if debt_ratio >= 0.90 else "",
             "시세 괴리 허위계약 의심" if abs(contract.nearby_market_gap_percent) >= 18 else "",
@@ -494,6 +544,12 @@ def rule_score_and_reasons(contract: ContractInput, model_row: dict[str, Any]) -
         add(20, "보증서 캡처만 제시하고 보증기관 조회를 막는 정황이 있습니다.", "danger", True)
     if text_flags["down_contract_text_risk"]:
         add(24, "계약서 금액과 실제 보증금 차액을 분리하는 다운계약·허위계약 위험이 있습니다.", "danger", True)
+    if text_flags["stale_registry_text_risk"]:
+        add(18, "잔금 직전 최신 등기부 재열람을 거부해 권리변동 확인 공백이 있습니다.", "warning", True)
+    if text_flags["movein_gap_text_risk"]:
+        add(22, "잔금 후 전입·점유가 지연되어 대항력 공백이 생길 수 있습니다.", "danger", True)
+    if text_flags["loan_broker_text_risk"]:
+        add(24, "전세대출 브로커가 명의대여 또는 허위 거주를 제안하는 정황이 있습니다.", "danger", True)
     if identity_mismatch or proxy_docs_deferred:
         add(22, "임대인 신원 또는 대리권 확인에 중대한 불일치가 있습니다.", "danger", True)
     if has_any(["전입신고 지연", "전입 전 근저당", "당일 근저당", "대항력 포기", "잔금 후 담보대출"]):
@@ -605,6 +661,12 @@ class RiskScorer:
         if text_flags["guarantee_document_text_risk"]:
             final_score = max(final_score, 72.0)
         if text_flags["down_contract_text_risk"]:
+            final_score = max(final_score, 76.0)
+        if text_flags["stale_registry_text_risk"]:
+            final_score = max(final_score, 66.0)
+        if text_flags["movein_gap_text_risk"]:
+            final_score = max(final_score, 74.0)
+        if text_flags["loan_broker_text_risk"]:
             final_score = max(final_score, 76.0)
         identity_mismatch = any(term in text for term in ["명의 불일치", "신분증 불일치", "위임장 미확인", "인감증명 미확인"]) or (
             "불일치" in text and any(term in text for term in ["명의", "신분증", "소유자"])
